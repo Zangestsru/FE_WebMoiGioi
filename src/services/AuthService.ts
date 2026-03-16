@@ -1,6 +1,6 @@
 import { authApi } from '../api/auth.api';
 import { AuthValidator } from '../utils/AuthValidator';
-import type { RegisterFormState, FormErrors, RegisterResponseDTO, LoginFormState, LoginResponseDTO } from '../types/auth.types';
+import type { RegisterFormState, FormErrors, RegisterResponseDTO, LoginFormState, LoginResponseDTO, VerifyOtpFormState } from '../types/auth.types';
 
 /**
  * AuthService - Business Logic Layer.
@@ -49,6 +49,38 @@ export class AuthService {
     const response = await authApi.login(apiPayload);
 
     return { response };
+  }
+
+  async verifyOtp(formState: VerifyOtpFormState): Promise<{
+    errors?: FormErrors;
+    response?: LoginResponseDTO;
+  }> {
+    // 1. Basic validation
+    if (!formState.otp || formState.otp.length !== 6) {
+      return { errors: { general: 'OTP must be 6 digits' } };
+    }
+
+    // 2. Call API
+    const response = await authApi.verifyOtp({
+      email: formState.email,
+      otp: formState.otp,
+    });
+
+    return { response };
+  }
+
+  async resendOtp(email: string): Promise<{ success: boolean; message: string }> {
+    return await authApi.resendOtp({ email });
+  }
+
+  async loginWithGoogle(idToken: string): Promise<LoginResponseDTO> {
+    const response = await authApi.googleLogin({ idToken });
+    return response;
+  }
+
+  async loginWithFacebook(accessToken: string): Promise<LoginResponseDTO> {
+    const response = await authApi.facebookLogin({ accessToken });
+    return response;
   }
 }
 

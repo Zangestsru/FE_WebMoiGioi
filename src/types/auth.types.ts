@@ -17,6 +17,23 @@ export interface LoginRequestDTO {
   password: string;
 }
 
+export interface VerifyOTPRequestDTO {
+  email: string;
+  otp: string;
+}
+
+export interface ResendOTPRequestDTO {
+  email: string;
+}
+
+export interface GoogleLoginRequestDTO {
+  idToken: string;
+}
+
+export interface FacebookLoginRequestDTO {
+  accessToken: string;
+}
+
 // --- Response DTOs ---
 export type AccountType = 'MEMBER' | 'AGENT' | 'AGENCY' | 'ADMIN' | 'MODERATOR';
 export type UserStatus = 'PENDING_VERIFICATION' | 'ACTIVE' | 'LOCKED' | 'BANNED';
@@ -54,6 +71,11 @@ export interface LoginFormState {
   identifier: string; // UI label: Phone Number Or Email
   password: string;
   rememberMe: boolean;
+}
+
+export interface VerifyOtpFormState {
+  email: string;
+  otp: string;
 }
 
 export interface FormErrors {

@@ -8,17 +8,28 @@ import { FormButton } from '../ui/FormButton';
  */
 interface RegisterModalProps {
   onSwitchToLogin?: () => void;
+  onSuccess?: (email: string) => void;
 }
 
-export function RegisterModal({ onSwitchToLogin }: RegisterModalProps) {
+export function RegisterModal({ onSwitchToLogin, onSuccess }: RegisterModalProps) {
   const {
     formState,
     errors,
     isLoading,
     successMessage,
     handleChange,
-    handleSubmit,
+    handleSubmit: originalHandleSubmit,
   } = useRegisterForm();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    const success = await originalHandleSubmit(e);
+    if (success && onSuccess) {
+      const email = localStorage.getItem('pending_auth_email') || '';
+      onSuccess(email);
+    }
+  };
+
+  // We should actually modify useRegisterForm to return the result or accept a callback
 
   return (
     <div className="flex h-full w-full flex-col sm:flex-row bg-white">

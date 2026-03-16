@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/AuthService';
 import { AuthValidator } from '../utils/AuthValidator';
 import type { RegisterFormState, FormErrors } from '../types/auth.types';
@@ -22,6 +23,7 @@ export function useRegisterForm() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleChange = (field: keyof RegisterFormState, value: string | boolean) => {
     const newState = { ...formState, [field]: value };
@@ -42,7 +44,7 @@ export function useRegisterForm() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent): Promise<boolean> => {
     e.preventDefault();
     setIsLoading(true);
     setErrors({});
@@ -53,17 +55,28 @@ export function useRegisterForm() {
 
       if (result.errors) {
         setErrors(result.errors);
-        return;
+        return false;
       }
 
       if (result.response?.success) {
-        setSuccessMessage(result.response.message);
-        setFormState(INITIAL_FORM_STATE);
+        setSuccessMessage('Đăng ký thành công! Đang chuyển đến trang xác thực...');
+        
+        // Store email for OTP verification step
+        localStorage.setItem('pending_auth_email', formState.email);
+
+        // Redirect to OTP page after a short delay
+        setTimeout(() => {
+          navigate('/verify-otp');
+        }, 1500);
+        
+        return true;
       }
-    } catch (error) {
+      return false;
+    } catch (error: any) {
       setErrors({
-        general: error instanceof Error ? error.message : 'Đã xảy ra lỗi không xác định',
+        general: error.message || 'Đăng ký thất bại. Vui lòng thử lại sau.',
       });
+      return false;
     } finally {
       setIsLoading(false);
     }

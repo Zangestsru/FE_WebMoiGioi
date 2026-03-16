@@ -1,3 +1,4 @@
+import { useGoogleLogin } from '@react-oauth/google';
 import { useLoginForm } from '../../hooks/useLoginForm';
 import { FormInput } from '../ui/FormInput';
 import { FormButton } from '../ui/FormButton';
@@ -18,7 +19,14 @@ export function LoginModal({ onSwitchToRegister }: LoginModalProps) {
     successMessage,
     handleChange,
     handleSubmit,
+    handleGoogleSuccess,
+    handleFacebookLogin,
   } = useLoginForm();
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: (codeResponse) => handleGoogleSuccess(codeResponse.access_token), // Note: react-oauth/google usually gives access_token unless using auth-code flow. BE needs to verify if it wants idToken or accessToken.
+    onError: () => console.log('Login Failed'),
+  });
 
   return (
     <div className="flex h-full w-full flex-col sm:flex-row bg-white">
@@ -103,7 +111,43 @@ export function LoginModal({ onSwitchToRegister }: LoginModalProps) {
              <a href="/forgot-password" className="text-blue-500 font-semibold no-underline hover:underline text-sm font-primary text-center">
               Quên mật khẩu?
             </a>
-            <p className="font-primary text-sm text-gray-500 text-center m-0">
+
+            {/* Divider */}
+            <div className="relative flex items-center gap-4 my-2">
+              <div className="flex-1 h-[1px] bg-gray-200"></div>
+              <span className="font-primary text-[11px] font-bold text-gray-400 uppercase tracking-widest bg-white px-2">Hoặc đăng nhập với</span>
+              <div className="flex-1 h-[1px] bg-gray-200"></div>
+            </div>
+
+            {/* Social Buttons */}
+            <div className="grid grid-cols-2 gap-3">
+              <button 
+                type="button"
+                onClick={() => googleLogin()}
+                disabled={isLoading}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 border-[1.5px] border-gray-200 rounded-lg font-primary text-sm font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 disabled:opacity-50"
+              >
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" className="w-5 h-5" />
+                Google
+              </button>
+              <button 
+                type="button"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1877F2] border-[1.5px] border-[#1877F2] rounded-lg font-primary text-sm font-bold text-white hover:bg-[#166fe5] transition-all duration-200"
+                onClick={() => {
+                  // @ts-ignore
+                  window.FB.login((response: any) => {
+                    if (response.authResponse) {
+                      handleFacebookLogin(response.authResponse.accessToken);
+                    }
+                  }, { scope: 'public_profile' });
+                }}
+              >
+                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                Facebook
+              </button>
+            </div>
+
+            <p className="font-primary text-sm text-gray-500 text-center m-0 mt-2">
               Bạn chưa có tài khoản?{' '}
               <button
                 type="button"
