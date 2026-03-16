@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Modal } from '../../components/ui/Modal';
 import { RegisterModal } from '../../components/auth/RegisterModal';
+import { LoginModal } from '../../components/auth/LoginModal';
 import { FormButton } from '../../components/ui/FormButton';
 
 /**
@@ -8,13 +9,31 @@ import { FormButton } from '../../components/ui/FormButton';
  */
 export default function HomePage() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+
+  const handleSwitchToLogin = () => {
+    setIsRegisterOpen(false);
+    setIsLoginOpen(true);
+  };
+
+  const handleSwitchToRegister = () => {
+    setIsLoginOpen(false);
+    setIsRegisterOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Simple Navbar */}
       <header className="flex items-center justify-between px-6 py-4 md:px-12 border-b border-[#f0f0f0] bg-white sticky top-0 z-50">
         <span className="font-primary text-xl font-extrabold text-gray-900 tracking-[-0.01em]">🏠 Cò Đất</span>
-        <nav className="flex gap-2 items-center">
+        <nav className="flex gap-4 items-center">
+          <button
+            id="btn-nav-login"
+            className="font-primary text-base font-semibold text-gray-700 hover:text-blue-500 bg-transparent border-none cursor-pointer transition-colors"
+            onClick={() => setIsLoginOpen(true)}
+          >
+            Đăng nhập
+          </button>
           <FormButton
             id="btn-open-register"
             variant="primary"
@@ -44,7 +63,12 @@ export default function HomePage() {
 
       {/* Register Modal */}
       <Modal isOpen={isRegisterOpen} onClose={() => setIsRegisterOpen(false)}>
-        <RegisterModal />
+        <RegisterModal onSwitchToLogin={handleSwitchToLogin} />
+      </Modal>
+
+      {/* Login Modal */}
+      <Modal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)}>
+        <LoginModal onSwitchToRegister={handleSwitchToRegister} />
       </Modal>
     </div>
   );

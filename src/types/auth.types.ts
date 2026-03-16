@@ -13,7 +13,7 @@ export interface RegisterRequestDTO {
 }
 
 export interface LoginRequestDTO {
-  email: string;
+  email: string; // Used for both phone number and email as per BE property name
   password: string;
 }
 
@@ -36,10 +36,11 @@ export interface RegisterResponseDTO {
 
 export interface LoginResponseDTO {
   success: boolean;
+  message?: string;
   data: AuthUserDTO;
 }
 
-// --- Form state ---
+// --- Form states ---
 export interface RegisterFormState {
   fullName: string;
   email: string;
@@ -47,6 +48,12 @@ export interface RegisterFormState {
   password: string;
   confirmPassword: string;
   agreeToTerms: boolean;
+}
+
+export interface LoginFormState {
+  identifier: string; // UI label: Phone Number Or Email
+  password: string;
+  rememberMe: boolean;
 }
 
 export interface FormErrors {

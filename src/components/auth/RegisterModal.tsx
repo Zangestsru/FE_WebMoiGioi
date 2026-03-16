@@ -6,7 +6,11 @@ import { FormButton } from '../ui/FormButton';
  * RegisterModal - compact form version for use inside a Modal.
  * Reuses the same useRegisterForm hook (no duplicated logic).
  */
-export function RegisterModal() {
+interface RegisterModalProps {
+  onSwitchToLogin?: () => void;
+}
+
+export function RegisterModal({ onSwitchToLogin }: RegisterModalProps) {
   const {
     formState,
     errors,
@@ -140,7 +144,13 @@ export function RegisterModal() {
 
           <p className="font-primary text-sm text-gray-500 text-center mt-3 shrink-0">
             Bạn đã có tài khoản?{' '}
-            <a href="/login" className="text-blue-500 font-semibold no-underline hover:underline">Đăng nhập</a>{' '}
+            <button
+              type="button"
+              className="text-blue-500 font-semibold no-underline hover:underline bg-transparent border-none p-0 cursor-pointer"
+              onClick={onSwitchToLogin}
+            >
+              Đăng nhập
+            </button>{' '}
             tại đây
           </p>
         </div>

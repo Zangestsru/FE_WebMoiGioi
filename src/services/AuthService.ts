@@ -1,6 +1,6 @@
 import { authApi } from '../api/auth.api';
 import { AuthValidator } from '../utils/AuthValidator';
-import type { RegisterFormState, FormErrors, RegisterResponseDTO } from '../types/auth.types';
+import type { RegisterFormState, FormErrors, RegisterResponseDTO, LoginFormState, LoginResponseDTO } from '../types/auth.types';
 
 /**
  * AuthService - Business Logic Layer.
@@ -25,6 +25,28 @@ export class AuthService {
     // 2. Call API  (confirmPassword and agreeToTerms not sent to BE)
     const { agreeToTerms: _agreeToTerms, confirmPassword, ...apiPayload } = formState;
     const response = await authApi.register({ ...apiPayload, confirmPassword });
+
+    return { response };
+  }
+
+  async login(formState: LoginFormState): Promise<{
+    errors?: FormErrors;
+    response?: LoginResponseDTO;
+  }> {
+    // 1. Client-side validation
+    const errors = AuthValidator.validateLoginForm(formState);
+    if (!AuthValidator.isFormValid(errors)) {
+      return { errors };
+    }
+
+    // 2. Map form state to API payload (identifier -> email)
+    const apiPayload = {
+      email: formState.identifier,
+      password: formState.password,
+    };
+
+    // 3. Call API
+    const response = await authApi.login(apiPayload);
 
     return { response };
   }

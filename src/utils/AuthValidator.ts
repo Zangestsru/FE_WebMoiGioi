@@ -1,4 +1,4 @@
-import type { RegisterFormState, FormErrors } from '../types/auth.types';
+import type { RegisterFormState, FormErrors, LoginFormState } from '../types/auth.types';
 
 /**
  * FE validation rules - mirror the BE Zod schema exactly.
@@ -56,6 +56,32 @@ export class AuthValidator {
     // agreeToTerms
     if (!values.agreeToTerms) {
       errors.agreeToTerms = 'Bạn phải đồng ý với Điều khoản dịch vụ và Chính sách bảo mật';
+    }
+
+    return errors;
+  }
+
+  static validateLoginForm(values: LoginFormState): FormErrors {
+    const errors: FormErrors = {};
+
+    // identifier: Phone or Email
+    if (!values.identifier.trim()) {
+      errors.email = 'Vui lòng nhập email hoặc số điện thoại';
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const phoneRegex = /^(03|05|07|08|09|01[2|6|8|9])+(\d{8})$/;
+      
+      const isEmail = emailRegex.test(values.identifier);
+      const isPhone = phoneRegex.test(values.identifier);
+
+      if (!isEmail && !isPhone) {
+        errors.email = 'Email hoặc số điện thoại không hợp lệ';
+      }
+    }
+
+    // password: at least 1 char (BE says required)
+    if (!values.password) {
+      errors.password = 'Vui lòng nhập mật khẩu';
     }
 
     return errors;
