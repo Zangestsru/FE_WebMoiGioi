@@ -1,4 +1,4 @@
-import { useGoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { useLoginForm } from '../../hooks/useLoginForm';
 import { FormInput } from '../ui/FormInput';
 import { FormButton } from '../ui/FormButton';
@@ -23,10 +23,7 @@ export function LoginModal({ onSwitchToRegister }: LoginModalProps) {
     handleFacebookLogin,
   } = useLoginForm();
 
-  const googleLogin = useGoogleLogin({
-    onSuccess: (codeResponse) => handleGoogleSuccess(codeResponse.access_token), // Note: react-oauth/google usually gives access_token unless using auth-code flow. BE needs to verify if it wants idToken or accessToken.
-    onError: () => console.log('Login Failed'),
-  });
+
 
   return (
     <div className="flex h-full w-full flex-col sm:flex-row bg-white">
@@ -53,12 +50,18 @@ export function LoginModal({ onSwitchToRegister }: LoginModalProps) {
 
           {/* Success / Error Banners */}
           {successMessage && (
-            <div className="px-3 py-1.5 rounded-md text-sm font-medium font-primary bg-[#d1fae5] text-[#065f46] border border-[#6ee7b7]" role="status">
+            <div className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium font-primary bg-emerald-50 text-emerald-700 border border-emerald-100 animate-popup-fade-in" role="status">
+              <svg className="w-5 h-5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
               {successMessage}
             </div>
           )}
           {errors.general && (
-            <div className="px-3 py-1.5 rounded-md text-sm font-medium font-primary bg-[#fee2e2] text-[#991b1b] border border-[#fca5a5]" role="alert">
+            <div className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium font-primary bg-rose-50 text-rose-700 border border-rose-100 animate-popup-fade-in" role="alert">
+              <svg className="w-5 h-5 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               {errors.general}
             </div>
           )}
@@ -108,31 +111,43 @@ export function LoginModal({ onSwitchToRegister }: LoginModalProps) {
           </form>
 
           <div className="flex flex-col gap-2 mt-3 shrink-0">
-             <a href="/forgot-password" className="text-blue-500 font-semibold no-underline hover:underline text-sm font-primary text-center">
+            <a href="/forgot-password" className="text-blue-500 font-semibold no-underline hover:underline text-sm font-primary text-center">
               Quên mật khẩu?
             </a>
 
             {/* Divider */}
-            <div className="relative flex items-center gap-4 my-2">
-              <div className="flex-1 h-[1px] bg-gray-200"></div>
-              <span className="font-primary text-[11px] font-bold text-gray-400 uppercase tracking-widest bg-white px-2">Hoặc đăng nhập với</span>
-              <div className="flex-1 h-[1px] bg-gray-200"></div>
+            <div className="relative flex items-center gap-3 my-4">
+              <div className="flex-1 h-[1px] bg-gray-100"></div>
+              <span className="font-primary text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase tracking-widest bg-white px-3 relative z-10">
+                Hoặc đăng nhập với
+              </span>
+              <div className="flex-1 h-[1px] bg-gray-100"></div>
             </div>
 
             {/* Social Buttons */}
-            <div className="grid grid-cols-2 gap-3">
-              <button 
+            <div className="flex flex-col gap-3.5 mt-0.5">
+              <div className="w-full flex justify-center">
+                <div className="w-full max-w-[320px] flex justify-center">
+                  <GoogleLogin
+                    onSuccess={(credentialResponse: CredentialResponse) => {
+                      if (credentialResponse.credential) {
+                        handleGoogleSuccess(credentialResponse.credential);
+                      }
+                    }}
+                    onError={() => {
+                      console.log('Login Failed');
+                    }}
+                    theme="outline"
+                    size="large"
+                    text="signin_with"
+                    shape="rectangular"
+                    width="320"
+                  />
+                </div>
+              </div>
+              <button
                 type="button"
-                onClick={() => googleLogin()}
-                disabled={isLoading}
-                className="flex items-center justify-center gap-2 px-4 py-2.5 border-[1.5px] border-gray-200 rounded-lg font-primary text-sm font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 disabled:opacity-50"
-              >
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" className="w-5 h-5" />
-                Google
-              </button>
-              <button 
-                type="button"
-                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1877F2] border-[1.5px] border-[#1877F2] rounded-lg font-primary text-sm font-bold text-white hover:bg-[#166fe5] transition-all duration-200"
+                className="flex items-center justify-center gap-3 w-full px-4 py-2.5 bg-[#1877F2] border-[1.5px] border-[#1877F2] rounded-lg font-primary text-sm font-bold text-white hover:bg-[#166fe5] transition-all duration-200 shadow-sm"
                 onClick={() => {
                   // @ts-ignore
                   window.FB.login((response: any) => {
@@ -142,8 +157,8 @@ export function LoginModal({ onSwitchToRegister }: LoginModalProps) {
                   }, { scope: 'public_profile' });
                 }}
               >
-                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                Facebook
+                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
+                Tiếp tục với Facebook
               </button>
             </div>
 
