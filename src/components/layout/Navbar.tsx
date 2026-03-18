@@ -1,0 +1,157 @@
+import { useState } from 'react';
+import { Search, Building2, LogOut, User as UserIcon, ChevronDown, Menu, X } from 'lucide-react';
+import { useAuthStore } from '../../store/useAuthStore';
+
+interface NavbarProps {
+  onLoginClick: () => void;
+  onRegisterClick: () => void;
+}
+
+export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
+  const { user, isAuthenticated, logout } = useAuthStore();
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    setIsUserMenuOpen(false);
+  };
+
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-[100] bg-white border-b border-gray-100 h-[72px] flex items-center px-6 md:px-12">
+      <div className="max-w-[1440px] mx-auto w-full flex items-center justify-between gap-8">
+        
+        {/* LOGO */}
+        <div className="flex items-center gap-2 cursor-pointer shrink-0">
+          <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center text-white">
+            <Building2 size={24} />
+          </div>
+          <span className="font-primary text-lg font-black tracking-tight text-gray-900 uppercase">
+            Luxe Estate
+          </span>
+        </div>
+
+        {/* NAVIGATION LINKS - Desktop */}
+        <div className="hidden lg:flex items-center gap-8">
+          {[
+            { label: 'Mua', href: '#mua' },
+            { label: 'Bán', href: '#ban' },
+            { label: 'Dự án', href: '#du-an' },
+            { label: 'Tin tức', href: '#tin-tuc' }
+          ].map((item) => (
+            <a 
+              key={item.label} 
+              href={item.href}
+              className="font-primary text-[15px] font-semibold text-gray-700 hover:text-black transition-colors"
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+
+        {/* SEARCH BAR - Desktop */}
+        <div className="hidden md:flex flex-1 max-w-[400px] relative items-center">
+          <Search className="absolute left-4 text-gray-400" size={18} />
+          <input 
+            type="text"
+            placeholder="Tìm kiếm địa chỉ"
+            className="w-full bg-[#F3F4F6] border-none rounded-full py-2.5 pl-11 pr-4 font-primary text-sm focus:ring-2 focus:ring-black transition-all outline-none"
+          />
+        </div>
+
+        {/* ACTIONS / PROFILE */}
+        <div className="flex items-center gap-3">
+          {isAuthenticated && user ? (
+            <div className="relative">
+              <button 
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center gap-2.5 px-3 py-1.5 rounded-full hover:bg-gray-50 transition-colors border border-gray-100"
+              >
+                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                  <UserIcon size={18} />
+                </div>
+                <div className="hidden sm:flex flex-col items-start">
+                  <span className="font-primary text-sm font-bold text-gray-900 leading-none">
+                    {user.email?.split('@')[0]}
+                  </span>
+                </div>
+                <ChevronDown size={14} className={`text-gray-400 transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isUserMenuOpen && (
+                <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-[0_15px_50px_-12px_rgba(0,0,0,0.12)] border border-gray-100 py-2.5 z-[110] animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="px-5 py-3 border-b border-gray-50 mb-1.5">
+                    <p className="font-primary text-[11px] text-gray-400 font-bold uppercase tracking-[0.1em]">Tài khoản</p>
+                    <p className="font-primary text-sm text-gray-900 truncate font-semibold mt-0.5">{user.email}</p>
+                  </div>
+                  <button 
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3.5 px-5 py-3 text-red-500 hover:bg-red-50 transition-colors font-primary text-sm font-bold"
+                  >
+                    <LogOut size={18} />
+                    Đăng xuất
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <button 
+                onClick={onLoginClick}
+                className="px-6 py-2.5 font-primary text-[15px] font-bold text-gray-900 hover:bg-gray-50 rounded-full transition-colors border border-gray-200"
+              >
+                Đăng nhập
+              </button>
+              <button 
+                onClick={onRegisterClick}
+                className="px-6 py-2.5 font-primary text-[15px] font-bold text-gray-900 hover:bg-gray-50 rounded-full transition-colors border border-black"
+              >
+                Đăng ký
+              </button>
+            </>
+          )}
+
+          {/* MOBILE MENU TOGGLE */}
+          <button 
+            className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+      </div>
+
+      {/* MOBILE MENU */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 top-[72px] bg-white z-[90] flex flex-col p-6 gap-6 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex flex-col gap-4">
+            {[
+              { label: 'Mua', href: '#mua' },
+              { label: 'Bán', href: '#ban' },
+              { label: 'Dự án', href: '#du-an' },
+              { label: 'Tin tức', href: '#tin-tuc' }
+            ].map((item) => (
+              <a 
+                key={item.label} 
+                href={item.href}
+                className="font-primary text-lg font-bold text-gray-900 border-b border-gray-50 pb-4"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {item.label}
+              </a>
+            ))}
+          </div>
+          
+          <div className="relative mt-2">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <input 
+              type="text"
+              placeholder="Tìm kiếm địa chỉ"
+              className="w-full bg-[#F3F4F6] border-none rounded-2xl py-4 pl-12 pr-4 font-primary text-base"
+            />
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+}

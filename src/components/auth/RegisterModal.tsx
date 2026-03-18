@@ -16,7 +16,6 @@ export function RegisterModal({ onSwitchToLogin, onSuccess }: RegisterModalProps
     formState,
     errors,
     isLoading,
-    successMessage,
     handleChange,
     handleSubmit: originalHandleSubmit,
   } = useRegisterForm();
@@ -28,8 +27,6 @@ export function RegisterModal({ onSwitchToLogin, onSuccess }: RegisterModalProps
       onSuccess(email);
     }
   };
-
-  // We should actually modify useRegisterForm to return the result or accept a callback
 
   return (
     <div className="flex h-full w-full flex-col sm:flex-row bg-white">
@@ -53,13 +50,6 @@ export function RegisterModal({ onSwitchToLogin, onSuccess }: RegisterModalProps
       <div className="flex-1 w-full min-w-0 flex flex-col justify-center p-6 sm:px-8 sm:py-6 relative">
         <div className="flex flex-col gap-1 w-full">
           <h2 className="font-primary text-[33px] font-bold text-gray-900 m-0 mb-1 leading-tight">Đăng ký tài khoản mới</h2>
-
-          {/* Success */}
-          {successMessage && (
-            <div className="px-4 py-2 rounded-md text-sm font-medium font-primary bg-[#d1fae5] text-[#065f46] border border-[#6ee7b7] shrink-0" role="status">
-              {successMessage}
-            </div>
-          )}
 
           {/* General Error */}
           {errors.general && (

@@ -9,19 +9,19 @@ import { FormButton } from '../ui/FormButton';
  */
 interface LoginModalProps {
   onSwitchToRegister?: () => void;
+  onSuccess?: () => void;
 }
 
-export function LoginModal({ onSwitchToRegister }: LoginModalProps) {
+export function LoginModal({ onSwitchToRegister, onSuccess }: LoginModalProps) {
   const {
     formState,
     errors,
     isLoading,
-    successMessage,
     handleChange,
     handleSubmit,
     handleGoogleSuccess,
     handleFacebookLogin,
-  } = useLoginForm();
+  } = useLoginForm(onSuccess);
 
 
 
@@ -48,15 +48,6 @@ export function LoginModal({ onSwitchToRegister }: LoginModalProps) {
         <div className="flex flex-col gap-1 w-full">
           <h2 className="font-primary text-[33px] font-bold text-gray-900 m-0 mb-1 leading-tight">Đăng nhập</h2>
 
-          {/* Success / Error Banners */}
-          {successMessage && (
-            <div className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium font-primary bg-emerald-50 text-emerald-700 border border-emerald-100 animate-popup-fade-in" role="status">
-              <svg className="w-5 h-5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              {successMessage}
-            </div>
-          )}
           {errors.general && (
             <div className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium font-primary bg-rose-50 text-rose-700 border border-rose-100 animate-popup-fade-in" role="alert">
               <svg className="w-5 h-5 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -5,6 +5,8 @@ import RegisterPage from './pages/auth/register/RegisterPage';
 import VerifyOtpPage from './pages/auth/verify-otp/VerifyOtpPage';
 import { useAuthStore } from './store/useAuthStore';
 
+import { ToastContainer } from './components/ui/Toast';
+
 /**
  * App - main router entry point.
  * Handles public and protected routes.
@@ -14,6 +16,7 @@ function App() {
 
   return (
     <Router>
+      <ToastContainer />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
