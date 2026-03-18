@@ -1,0 +1,88 @@
+import { authApi } from '../api/auth.api';
+import { AuthValidator } from '../utils/AuthValidator';
+import type { RegisterFormState, FormErrors, RegisterResponseDTO, LoginFormState, LoginResponseDTO, VerifyOtpFormState } from '../types/auth.types';
+
+/**
+ * AuthService - Business Logic Layer.
+ * Orchestrates validation + API calls.
+ * UI components should NEVER call authApi directly.
+ */
+export class AuthService {
+  /**
+   * Validates the form locally, then calls the API.
+   * Returns errors object if validation fails, or throws on API error.
+   */
+  async register(formState: RegisterFormState): Promise<{
+    errors?: FormErrors;
+    response?: RegisterResponseDTO;
+  }> {
+    // 1. Client-side validation (fast feedback before network call)
+    const errors = AuthValidator.validateRegisterForm(formState);
+    if (!AuthValidator.isFormValid(errors)) {
+      return { errors };
+    }
+
+    // 2. Call API  (confirmPassword and agreeToTerms not sent to BE)
+    const { agreeToTerms: _agreeToTerms, confirmPassword, ...apiPayload } = formState;
+    const response = await authApi.register({ ...apiPayload, confirmPassword });
+
+    return { response };
+  }
+
+  async login(formState: LoginFormState): Promise<{
+    errors?: FormErrors;
+    response?: LoginResponseDTO;
+  }> {
+    // 1. Client-side validation
+    const errors = AuthValidator.validateLoginForm(formState);
+    if (!AuthValidator.isFormValid(errors)) {
+      return { errors };
+    }
+
+    // 2. Map form state to API payload (identifier -> email)
+    const apiPayload = {
+      email: formState.identifier,
+      password: formState.password,
+    };
+
+    // 3. Call API
+    const response = await authApi.login(apiPayload);
+
+    return { response };
+  }
+
+  async verifyOtp(formState: VerifyOtpFormState): Promise<{
+    errors?: FormErrors;
+    response?: LoginResponseDTO;
+  }> {
+    // 1. Basic validation
+    if (!formState.otp || formState.otp.length !== 6) {
+      return { errors: { general: 'OTP must be 6 digits' } };
+    }
+
+    // 2. Call API
+    const response = await authApi.verifyOtp({
+      email: formState.email,
+      otp: formState.otp,
+    });
+
+    return { response };
+  }
+
+  async resendOtp(email: string): Promise<{ success: boolean; message: string }> {
+    return await authApi.resendOtp({ email });
+  }
+
+  async loginWithGoogle(idToken: string): Promise<LoginResponseDTO> {
+    const response = await authApi.googleLogin({ idToken });
+    return response;
+  }
+
+  async loginWithFacebook(accessToken: string): Promise<LoginResponseDTO> {
+    const response = await authApi.facebookLogin({ accessToken });
+    return response;
+  }
+}
+
+// Singleton instance
+export const authService = new AuthService();
