@@ -120,7 +120,7 @@ const ProfilePage: React.FC = () => {
         setOtpCooldown(60);
         showStatus('Đã gửi mã', 'Mã xác nhận bảo mật đã được gửi đến Gmail của bạn.', 'success');
       }
-    } catch (err: any) {
+    } catch (error) {
       showStatus('Lỗi OTP', 'Hệ thống không thể gửi mã OTP lúc này.', 'error');
     } finally {
       setIsUpdatingPwd(false);
@@ -155,7 +155,7 @@ const ProfilePage: React.FC = () => {
           setPwdForm({ currentPassword: '', newPassword: '', confirmPassword: '', otp: '' });
         }
       }
-    } catch (err: any) {
+    } catch (error) {
       showStatus('Thất bại', 'Đổi mật khẩu thất bại. Vui lòng kiểm tra lại.', 'error');
     } finally {
       setIsUpdatingPwd(false);

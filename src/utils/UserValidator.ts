@@ -1,4 +1,4 @@
-import type { UpdateProfileRequestDTO, ChangePasswordRequestDTO } from '../types/user.types';
+import type { UpdateProfileRequestDTO, ChangePasswordRequestDTO, SetPasswordRequestDTO } from '../types/user.types';
 
 export class UserValidator {
   /**
@@ -50,7 +50,7 @@ export class UserValidator {
   /**
    * Validation for setting new password (for social users)
    */
-  static validateSetPassword(data: any): Record<string, string> {
+  static validateSetPassword(data: SetPasswordRequestDTO): Record<string, string> {
     const errors: Record<string, string> = {};
 
     if (!data.otp || data.otp.length !== 6) {

@@ -72,8 +72,9 @@ export function useRegisterForm() {
         return true;
       }
       return false;
-    } catch (error: any) {
-      const msg = error.message || 'Đăng ký thất bại. Vui lòng thử lại sau.';
+    } catch (error) {
+      const err = error as any;
+      const msg = err.message || 'Đăng ký thất bại. Vui lòng thử lại sau.';
       setErrors({ general: msg });
       showStatus('Lỗi đăng ký', msg, 'error');
       return false;

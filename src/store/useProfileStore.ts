@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { userService } from '../services/UserService';
-import type { UserProfile, User, ApiResponse } from '../types/user.types';
+import type { UserProfile, UpdateProfileRequestDTO } from '../types/user.types';
 
 interface ProfileState {
   profile: UserProfile | null;
@@ -14,7 +14,7 @@ interface ProfileState {
   
   // Actions
   fetchProfile: () => Promise<void>;
-  updateProfile: (data: any) => Promise<{ success: boolean; errors?: Record<string, string>; message?: string }>;
+  updateProfile: (data: UpdateProfileRequestDTO) => Promise<{ success: boolean; errors?: Record<string, string>; message?: string }>;
   updateAvatar: (file: File) => Promise<{ success: boolean; avatarUrl?: string; message?: string }>;
   
   // Local state update (for immediate UI sync if needed)
@@ -58,7 +58,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     }
   },
 
-  updateProfile: async (data) => {
+  updateProfile: async (data: UpdateProfileRequestDTO) => {
     set({ isUpdating: true });
     try {
       const { response, errors } = await userService.updateProfile(data);
@@ -70,8 +70,9 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
         return { success: true };
       }
       return { success: false, message: 'Cập nhật không thành công' };
-    } catch (error: any) {
-      return { success: false, message: error.response?.data?.message || 'Lỗi hệ thống' };
+    } catch (error) {
+      const err = error as any;
+      return { success: false, message: err.response?.data?.message || 'Lỗi hệ thống' };
     } finally {
       set({ isUpdating: false });
     }
@@ -87,7 +88,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
         return { success: true, avatarUrl: response.data.avatarUrl };
       }
       return { success: false, message: 'Upload ảnh thất bại' };
-    } catch (error: any) {
+    } catch (error) {
       return { success: false, message: 'Lỗi khi tải ảnh lên Cloudinary' };
     } finally {
       set({ isUpdating: false });

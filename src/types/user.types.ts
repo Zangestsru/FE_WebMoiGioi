@@ -17,7 +17,7 @@ export interface UserProfile {
   identityCardNumber?: string | null;
   brokerLicenseNumber?: string | null;
   websiteUrl?: string | null;
-  socialLinks?: any;
+  socialLinks?: Record<string, string> | null;
   zaloContactPhone?: string | null;
 }
 
@@ -50,7 +50,7 @@ export interface UpdateProfileRequestDTO {
   identityCardNumber?: string;
   brokerLicenseNumber?: string;
   websiteUrl?: string;
-  socialLinks?: any;
+  socialLinks?: Record<string, string> | null;
   zaloContactPhone?: string;
 }
 

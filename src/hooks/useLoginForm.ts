@@ -64,9 +64,10 @@ export function useLoginForm(onSuccess?: () => void) {
           navigate('/');
         }
       }
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as any;
       setErrors({
-        general: error.message || 'Đã xảy ra lỗi không xác định',
+        general: err.message || 'Đã xảy ra lỗi không xác định',
       });
     } finally {
       setIsLoading(false);
@@ -87,8 +88,9 @@ export function useLoginForm(onSuccess?: () => void) {
           navigate('/');
         }
       }
-    } catch (error: any) {
-      setErrors({ general: error.message || 'Đăng nhập Google thất bại' });
+    } catch (error) {
+      const err = error as any;
+      setErrors({ general: err.message || 'Đăng nhập Google thất bại' });
     } finally {
       setIsLoading(false);
     }
@@ -108,8 +110,9 @@ export function useLoginForm(onSuccess?: () => void) {
           navigate('/');
         }
       }
-    } catch (error: any) {
-      setErrors({ general: error.message || 'Đăng nhập Facebook thất bại' });
+    } catch (error) {
+      const err = error as any;
+      setErrors({ general: err.message || 'Đăng nhập Facebook thất bại' });
     } finally {
       setIsLoading(false);
     }

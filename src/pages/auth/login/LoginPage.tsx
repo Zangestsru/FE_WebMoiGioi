@@ -12,18 +12,15 @@ export default function LoginPage() {
     formState,
     errors,
     isLoading,
-    successMessage,
     handleChange,
     handleSubmit,
     handleGoogleSuccess,
     handleFacebookLogin,
   } = useLoginForm();
 
-
-
   return (
     <main className="flex min-h-screen overflow-hidden flex-col md:flex-row">
-      {/* LEFT: Hero Image Panel (Synchronized with Register) */}
+      {/* ... (existing section) ... */}
       <section
         className="relative flex-1 min-w-0 bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center bg-[#0a1632] min-h-[260px] md:min-h-[auto] p-8"
         style={{ backgroundImage: `url('${import.meta.env.VITE_REGISTER_BG_IMAGE}')` }}
@@ -44,16 +41,6 @@ export default function LoginPage() {
       <section className="w-full md:w-[460px] shrink-0 bg-white flex items-center justify-center py-12 px-8 overflow-y-auto" aria-label="Biểu mẫu đăng nhập">
         <div className="w-full max-w-[360px] flex flex-col gap-4">
           <h2 className="font-heading text-3xl font-bold text-gray-900 m-0 mb-1 tracking-[-0.01em]">Đăng nhập</h2>
-
-          {/* Success Banner */}
-          {successMessage && (
-            <div className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium font-primary bg-emerald-50 text-emerald-700 border border-emerald-100 animate-popup-fade-in" role="status">
-              <svg className="w-5 h-5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              {successMessage}
-            </div>
-          )}
 
           {/* General Error Banner */}
           {errors.general && (
@@ -154,7 +141,7 @@ export default function LoginPage() {
                 className="flex items-center justify-center gap-3 w-full px-4 py-3 bg-[#1877F2] border-[1.5px] border-[#1877F2] rounded-xl font-primary text-sm font-bold text-white hover:bg-[#166fe5] transition-all duration-200 shadow-sm"
                 onClick={() => {
                   // @ts-ignore
-                  window.FB.login((response: any) => {
+                  window.FB.login((response: { authResponse?: { accessToken: string } }) => {
                     if (response.authResponse) {
                       handleFacebookLogin(response.authResponse.accessToken);
                     }

@@ -49,8 +49,9 @@ export function useVerifyOtpForm(initialEmail: string = '') {
         // Redirect after a brief delay
         setTimeout(() => navigate('/'), 1000);
       }
-    } catch (error: any) {
-      const msg = error.message || 'Xác thực không thành công. Vui lòng thử lại sau.';
+    } catch (error) {
+      const err = error as any;
+      const msg = err.message || 'Xác thực không thành công. Vui lòng thử lại sau.';
       showStatus('Lỗi xác thực', msg, 'error');
     } finally {
       setIsLoading(false);
@@ -71,8 +72,9 @@ export function useVerifyOtpForm(initialEmail: string = '') {
       if (result.success) {
         showStatus('Gửi lại mã', 'Mã OTP mới đã được gửi đến email của bạn.', 'success');
       }
-    } catch (error: any) {
-      const msg = error.message || 'Gửi lại mã OTP thất bại.';
+    } catch (error) {
+      const err = error as any;
+      const msg = err.message || 'Gửi lại mã OTP thất bại.';
       showStatus('Gửi lại thất bại', msg, 'error');
     } finally {
       setIsResending(false);

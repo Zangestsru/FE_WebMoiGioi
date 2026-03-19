@@ -141,7 +141,7 @@ export function LoginModal({ onSwitchToRegister, onSuccess }: LoginModalProps) {
                 className="flex items-center justify-center gap-3 w-full px-4 py-2.5 bg-[#1877F2] border-[1.5px] border-[#1877F2] rounded-lg font-primary text-sm font-bold text-white hover:bg-[#166fe5] transition-all duration-200 shadow-sm"
                 onClick={() => {
                   // @ts-ignore
-                  window.FB.login((response: any) => {
+                  window.FB.login((response: { authResponse?: { accessToken: string } }) => {
                     if (response.authResponse) {
                       handleFacebookLogin(response.authResponse.accessToken);
                     }
