@@ -16,6 +16,7 @@ export function FormButton({
   variant = 'primary',
   fullWidth = false,
   disabled,
+  className = '',
   ...buttonProps
 }: FormButtonProps) {
   return (
@@ -23,6 +24,7 @@ export function FormButton({
       className={`inline-flex items-center justify-center px-8 py-4 border-none rounded-xl font-primary text-base font-bold cursor-pointer transition-all duration-200 tracking-[0.03em]
         ${fullWidth ? 'w-full' : ''}
         ${variant === 'primary' ? 'bg-blue-500 text-white shadow-[0_4px_14px_rgba(59,130,246,0.35)] hover:bg-blue-600 hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(59,130,246,0.35)] disabled:bg-blue-300 disabled:cursor-not-allowed disabled:shadow-none' : ''}
+        ${className}
       `}
       disabled={disabled || isLoading}
       {...buttonProps}

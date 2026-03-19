@@ -1,4 +1,3 @@
-import { Building2 } from 'lucide-react';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -7,14 +6,11 @@ export function Footer() {
     <footer className="bg-black text-white pt-20 pb-10 px-6 md:px-12">
       <div className="max-w-[1440px] mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-20">
-          
-          {/* COLUMN 1: BRAND */}
+
           <div className="flex flex-col gap-6">
             <div className="flex items-center gap-2">
-              {/* Using a simplified version of the logo for footer */}
-              <Building2 size={28} className="text-white" />
               <span className="font-primary text-xl font-black tracking-tighter uppercase">
-                Luxury Estates
+                Bất Động Sản Việt Nam
               </span>
             </div>
             <p className="font-primary text-gray-400 text-[15px] leading-relaxed max-w-[300px]">
@@ -66,8 +62,8 @@ export function Footer() {
               Nhận các bản cập nhật chọn lọc về thị trường cao cấp.
             </p>
             <div className="flex items-center gap-2 bg-[#D1D5DB] rounded-lg p-1.5 focus-within:ring-2 focus-within:ring-[#EAB308] transition-all">
-              <input 
-                type="email" 
+              <input
+                type="email"
                 placeholder="Email của bạn"
                 className="bg-transparent border-none text-black font-primary text-sm px-3 py-2 outline-none flex-1 placeholder:text-gray-500"
               />
@@ -89,9 +85,9 @@ export function Footer() {
               { label: 'Điều khoản dịch vụ', href: '#' },
               { label: 'Cài đặt Cookie', href: '#' }
             ].map((item) => (
-              <a 
-                key={item.label} 
-                href={item.href} 
+              <a
+                key={item.label}
+                href={item.href}
                 className="font-primary text-gray-500 hover:text-white transition-colors text-[13px]"
               >
                 {item.label}

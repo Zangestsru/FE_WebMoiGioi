@@ -50,8 +50,8 @@ export default function HomePage() {
       />
 
       {/* Hero content */}
-      <main className="flex-1 flex flex-col items-center justify-center gap-8 text-center px-6 py-32 mt-[72px] bg-gradient-to-b from-gray-50/50 to-white">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 font-primary text-xs font-bold uppercase tracking-widest mb-2 animate-in fade-in slide-in-from-bottom-2 duration-700">
+      <main className="flex-1 flex flex-col items-center justify-center gap-4 text-center px-6 py-16 mt-[72px] bg-gradient-to-b from-gray-50/50 to-white">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 font-primary text-xs font-bold uppercase tracking-widest animate-in fade-in slide-in-from-bottom-2 duration-700">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
@@ -59,24 +59,24 @@ export default function HomePage() {
           Được tin dùng bởi hơn 10,000 khách hàng
         </div>
         
-        <h1 className="font-heading text-[clamp(2.5rem,8vw,5rem)] font-extrabold text-[#0a1632] m-0 leading-[1.1] tracking-tight max-w-[1000px] animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        <h1 className="font-heading text-[clamp(2.5rem,8vw,4.5rem)] font-extrabold text-[#0a1632] m-0 leading-[1.1] tracking-tight max-w-[1000px] animate-in fade-in slide-in-from-bottom-4 duration-1000">
           Kiến tạo Thịnh vượng thông qua Bất động sản <span className="text-blue-600 italic">Cao cấp</span>
         </h1>
         
-        <p className="font-primary text-lg md:text-xl text-gray-500 m-0 max-w-[600px] leading-relaxed animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-200">
+        <p className="font-primary text-base md:text-lg text-gray-500 m-0 max-w-[600px] leading-relaxed animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-200">
           Truy cập các danh sách độc quyền, tư vấn từ chuyên gia và sự hiện diện toàn cầu tại các thị trường uy tín nhất.
         </p>
         
-        <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+        <div className="flex flex-col sm:flex-row items-center gap-3 mt-4 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
           <FormButton
             id="btn-hero-register"
             variant="primary"
             onClick={() => setIsRegisterOpen(true)}
-            className="px-10 py-4 h-auto text-base shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 transition-all rounded-2xl"
+            className="px-8 py-3.5 h-auto text-base shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 transition-all rounded-2xl"
           >
             Bắt đầu ngay
           </FormButton>
-          <button className="px-10 py-4 font-primary font-bold text-[#0a1632] hover:bg-gray-50 rounded-2xl transition-all h-auto border border-gray-100">
+          <button className="px-8 py-3.5 font-primary font-bold text-[#0a1632] hover:bg-gray-50 rounded-2xl transition-all h-auto border border-gray-100">
             Xem báo cáo thị trường
           </button>
         </div>

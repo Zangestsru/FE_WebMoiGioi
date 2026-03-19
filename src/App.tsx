@@ -3,6 +3,7 @@ import HomePage from './pages/home/HomePage';
 import LoginPage from './pages/auth/login/LoginPage';
 import RegisterPage from './pages/auth/register/RegisterPage';
 import VerifyOtpPage from './pages/auth/verify-otp/VerifyOtpPage';
+import ProfilePage from './pages/profile/ProfilePage';
 import { useAuthStore } from './store/useAuthStore';
 
 import { ToastContainer } from './components/ui/Toast';
@@ -31,6 +32,10 @@ function App() {
           element={isAuthenticated ? <Navigate to="/" /> : <RegisterPage />} 
         />
         <Route path="/verify-otp" element={<VerifyOtpPage />} />
+        <Route 
+          path="/profile" 
+          element={isAuthenticated ? <ProfilePage /> : <Navigate to="/login" />} 
+        />
 
         {/* Catch-all - Redirect to home */}
         <Route path="*" element={<Navigate to="/" />} />

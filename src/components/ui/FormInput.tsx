@@ -17,11 +17,12 @@ export function FormInput({ label, error, id, ...inputProps }: FormInputProps) {
       </label>
       <input
         id={id}
-        className={`w-full px-3 py-1.5 bg-[#ddd8d0] border-[1.5px] rounded-md font-primary text-[14px] text-gray-900 outline-none transition-all duration-200 box-border placeholder-gray-500
+        className={`w-full px-4 py-3 bg-white border border-gray-200 rounded-xl font-primary text-[15px] text-gray-900 outline-none transition-all duration-200 box-border placeholder-gray-400
           ${error
             ? 'border-red-600 focus:shadow-[0_0_0_2px_rgba(220,38,38,0.18)]'
-            : 'border-transparent focus:border-blue-500 focus:shadow-[0_0_0_2px_rgba(59,130,246,0.18)]'
-          }`}
+            : 'focus:border-black focus:shadow-[0_0_0_4px_rgba(0,0,0,0.03)]'
+          }
+           disabled:bg-[#F3F4F6] disabled:border-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed`}
         {...inputProps}
       />
       {error && (
