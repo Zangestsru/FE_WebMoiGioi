@@ -1,7 +1,7 @@
 import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { Search, LogOut, User as UserIcon, ChevronDown, Menu, X } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
-import { Link } from 'react-router-dom';
 
 interface NavbarProps {
   onLoginClick: () => void;
@@ -10,13 +10,16 @@ interface NavbarProps {
 
 export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
   const { user, isAuthenticated, logout } = useAuthStore();
+  const navigate = useNavigate();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     setIsUserMenuOpen(false);
+    navigate('/');
   };
+
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-[100] bg-white border-b border-gray-100 h-[72px] flex items-center px-6 md:px-12">

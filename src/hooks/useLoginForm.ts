@@ -3,7 +3,7 @@ import type React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/AuthService';
 import { useAuthStore } from '../store/useAuthStore';
-import { useToastStore } from '../store/useToastStore';
+import { useUIStore } from '../store/useUIStore';
 import type { LoginFormState, FormErrors } from '../types/auth.types';
 
 const INITIAL_FORM_STATE: LoginFormState = {
@@ -23,7 +23,7 @@ export function useLoginForm(onSuccess?: () => void) {
   
   const navigate = useNavigate();
   const { setUser } = useAuthStore();
-  const addToast = useToastStore((state) => state.addToast);
+  const { showStatus } = useUIStore();
 
   const handleChange = (field: keyof LoginFormState, value: string | boolean) => {
     setFormState((prev) => ({ ...prev, [field]: value }));
@@ -51,7 +51,7 @@ export function useLoginForm(onSuccess?: () => void) {
       }
 
       if (result.response?.success) {
-        addToast('Đăng nhập thành công!', 'success');
+        showStatus('Đăng nhập thành công', 'Chào mừng bạn quay trở lại hệ thống!', 'success');
         
         // Update Auth Store
         setUser(result.response.data);
@@ -80,7 +80,7 @@ export function useLoginForm(onSuccess?: () => void) {
       const response = await authService.loginWithGoogle(idToken);
       if (response.success) {
         setUser(response.data);
-        addToast('Đăng nhập Google thành công!', 'success');
+        showStatus('Đăng nhập Google', 'Đăng nhập thông qua tài khoản Google thành công.', 'success');
         if (onSuccess) {
           onSuccess();
         } else {
@@ -101,7 +101,7 @@ export function useLoginForm(onSuccess?: () => void) {
       const response = await authService.loginWithFacebook(accessToken);
       if (response.success) {
         setUser(response.data);
-        addToast('Đăng nhập Facebook thành công!', 'success');
+        showStatus('Đăng nhập Facebook', 'Đăng nhập thông qua tài khoản Facebook thành công.', 'success');
         if (onSuccess) {
           onSuccess();
         } else {

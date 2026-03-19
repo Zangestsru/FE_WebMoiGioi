@@ -3,7 +3,7 @@ import type React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/AuthService';
 import { AuthValidator } from '../utils/AuthValidator';
-import { useToastStore } from '../store/useToastStore';
+import { useUIStore } from '../store/useUIStore';
 import type { RegisterFormState, FormErrors } from '../types/auth.types';
 
 const INITIAL_FORM_STATE: RegisterFormState = {
@@ -23,7 +23,7 @@ export function useRegisterForm() {
   const [formState, setFormState] = useState<RegisterFormState>(INITIAL_FORM_STATE);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
-  const addToast = useToastStore((state) => state.addToast);
+  const { showStatus } = useUIStore();
   const navigate = useNavigate();
 
   const handleChange = (field: keyof RegisterFormState, value: string | boolean) => {
@@ -59,7 +59,7 @@ export function useRegisterForm() {
       }
 
       if (result.response?.success) {
-        addToast('Đăng ký thành công! Đang chuyển đến bước xác thực...', 'success');
+        showStatus('Đăng ký thành công', 'Chào mừng bạn! Vui lòng xác thực tài khoản để tiếp tục.', 'success');
         
         // Store email for OTP verification step
         localStorage.setItem('pending_auth_email', formState.email);
@@ -75,7 +75,7 @@ export function useRegisterForm() {
     } catch (error: any) {
       const msg = error.message || 'Đăng ký thất bại. Vui lòng thử lại sau.';
       setErrors({ general: msg });
-      addToast(msg, 'error');
+      showStatus('Lỗi đăng ký', msg, 'error');
       return false;
     } finally {
       setIsLoading(false);

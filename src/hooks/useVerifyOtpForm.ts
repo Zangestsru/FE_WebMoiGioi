@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/AuthService';
 import { useAuthStore } from '../store/useAuthStore';
-import { useToastStore } from '../store/useToastStore';
+import { useUIStore } from '../store/useUIStore';
 import type { VerifyOtpFormState, FormErrors } from '../types/auth.types';
 
 /**
@@ -18,7 +18,7 @@ export function useVerifyOtpForm(initialEmail: string = '') {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
-  const addToast = useToastStore((state) => state.addToast);
+  const { showStatus } = useUIStore();
 
   const navigate = useNavigate();
   const { setUser } = useAuthStore();
@@ -41,7 +41,7 @@ export function useVerifyOtpForm(initialEmail: string = '') {
       if (result.errors) {
         setErrors(result.errors);
       } else if (result.response?.success) {
-        addToast('Xác thực tài khoản thành công! Đang đăng nhập...', 'success');
+        showStatus('Xác thực thành công', 'Chào mừng bạn! Đang chuyển hướng đăng nhập...', 'success');
         
         // Update Auth Store
         setUser(result.response.data);
@@ -51,8 +51,7 @@ export function useVerifyOtpForm(initialEmail: string = '') {
       }
     } catch (error: any) {
       const msg = error.message || 'Xác thực không thành công. Vui lòng thử lại sau.';
-      setErrors({ general: msg });
-      addToast(msg, 'error');
+      showStatus('Lỗi xác thực', msg, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -70,12 +69,11 @@ export function useVerifyOtpForm(initialEmail: string = '') {
     try {
       const result = await authService.resendOtp(formState.email);
       if (result.success) {
-        addToast('Mã OTP mới đã được gửi đến email của bạn.', 'success');
+        showStatus('Gửi lại mã', 'Mã OTP mới đã được gửi đến email của bạn.', 'success');
       }
     } catch (error: any) {
       const msg = error.message || 'Gửi lại mã OTP thất bại.';
-      setErrors({ general: msg });
-      addToast(msg, 'error');
+      showStatus('Gửi lại thất bại', msg, 'error');
     } finally {
       setIsResending(false);
     }
