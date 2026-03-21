@@ -22,10 +22,10 @@ export function VerifyOtpModal({ email, onSuccess, onBackToLogin }: VerifyOtpMod
   } = useVerifyOtpForm(email);
 
   return (
-    <div className="flex h-full w-full flex-col sm:flex-row bg-white">
+    <div className="flex w-full flex-col sm:flex-row bg-white overflow-hidden">
       {/* LEFT: Image panel */}
       <div
-        className="relative w-full sm:w-[320px] shrink-0 bg-cover bg-center bg-no-repeat rounded-t-xl sm:rounded-none sm:rounded-l-xl overflow-hidden bg-[#2b3543] flex items-end p-6 h-[120px] sm:h-full"
+        className="relative w-full sm:w-[320px] shrink-0 bg-cover bg-center bg-no-repeat rounded-t-xl sm:rounded-none sm:rounded-l-xl overflow-hidden bg-[#2b3543] flex items-end p-6 h-[140px] sm:h-auto"
         style={{
           backgroundImage: import.meta.env.VITE_REGISTER_BG_IMAGE
             ? `url('${import.meta.env.VITE_REGISTER_BG_IMAGE}')`
