@@ -1,24 +1,19 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { LogOut, User as UserIcon, ChevronDown } from 'lucide-react';
 import { Modal } from '../../components/ui/Modal';
 import { RegisterModal } from '../../components/auth/RegisterModal';
 import { LoginModal } from '../../components/auth/LoginModal';
 import { VerifyOtpModal } from '../../components/auth/VerifyOtpModal';
-import { FormButton } from '../../components/ui/FormButton';
-import { useAuthStore } from '../../store/useAuthStore';
+import { Navbar } from '../../components/layout/Navbar';
+import { Footer } from '../../components/layout/Footer';
+import { StatusModal } from '../../components/ui/StatusModal';
 
 /**
- * HomePage - simple white landing page for testing register modal.
+ * HomePage - Integrated with new Navbar and Footer.
  */
 export default function HomePage() {
-  const { user, isAuthenticated, logout } = useAuthStore();
-  const navigate = useNavigate();
-  
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isVerifyOtpOpen, setIsVerifyOtpOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [pendingEmail, setPendingEmail] = useState('');
 
   const handleSwitchToLogin = () => {
@@ -39,113 +34,69 @@ export default function HomePage() {
 
   const handleVerifySuccess = () => {
     setIsVerifyOtpOpen(false);
-    window.location.reload(); 
+    window.location.reload();
   };
 
-  const handleLogout = () => {
-    logout();
-    setIsUserMenuOpen(false);
-    navigate('/');
+  const handleLoginSuccess = () => {
+    setIsLoginOpen(false);
+    // Modal will close automatically via state
   };
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* Simple Navbar */}
-      <header className="flex items-center justify-between px-6 py-4 md:px-12 border-b border-[#f0f0f0] bg-white sticky top-0 z-50">
-        <span className="font-primary text-xl font-extrabold text-gray-900 tracking-[-0.01em]">🏠 Trần Vũ Anh</span>
-        
-        <nav className="flex gap-4 items-center">
-          {isAuthenticated && user ? (
-            <div className="relative">
-              <button 
-                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="flex items-center gap-2 px-3 py-2 rounded-full hover:bg-gray-50 transition-colors border border-gray-100"
-              >
-                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                  <UserIcon size={18} />
-                </div>
-                <div className="flex flex-col items-start hidden sm:flex">
-                  <span className="font-primary text-sm font-bold text-gray-900 leading-none mb-1">
-                    {user.email?.split('@')[0]}
-                  </span>
-                  <span className="font-primary text-[10px] text-gray-400 font-medium">
-                    {user.accountType}
-                  </span>
-                </div>
-                <ChevronDown size={14} className={`text-gray-400 transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-gray-100 py-2 z-[60] animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="px-4 py-2 border-b border-gray-50 mb-1">
-                    <p className="font-primary text-[11px] text-gray-400 font-bold uppercase tracking-wider">Tài khoản</p>
-                    <p className="font-primary text-sm text-gray-900 truncate font-medium">{user.email}</p>
-                  </div>
-                  <button 
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-red-500 hover:bg-red-50 transition-colors font-primary text-sm font-semibold"
-                  >
-                    <LogOut size={16} />
-                    Đăng xuất
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <>
-              <button
-                id="btn-nav-login"
-                className="font-primary text-base font-semibold text-gray-700 hover:text-blue-500 bg-transparent border-none cursor-pointer transition-colors"
-                onClick={() => setIsLoginOpen(true)}
-              >
-                Đăng nhập
-              </button>
-              <FormButton
-                id="btn-open-register"
-                variant="primary"
-                onClick={() => setIsRegisterOpen(true)}
-              >
-                Đăng ký
-              </FormButton>
-            </>
-          )}
-        </nav>
-      </header>
+      <Navbar
+        onLoginClick={() => setIsLoginOpen(true)}
+        onRegisterClick={() => setIsRegisterOpen(true)}
+      />
 
       {/* Hero content */}
-      <main className="flex-1 flex flex-col items-center justify-center gap-6 text-center p-12">
-        <h1 className="font-heading text-[clamp(2rem,5vw,3.5rem)] font-bold text-gray-900 m-0 leading-[1.2]">
-          Nền tảng bất động sản uy tín
+      <main className="flex-1 flex flex-col items-center justify-center gap-4 text-center px-6 py-16 mt-[72px] bg-gradient-to-b from-gray-50/50 to-white">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 font-primary text-xs font-bold uppercase tracking-widest animate-in fade-in slide-in-from-bottom-2 duration-700">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+          </span>
+          Được tin dùng bởi hơn 10,000 khách hàng
+        </div>
+
+        <h1 className="font-heading text-[clamp(2.5rem,8vw,4.5rem)] font-extrabold text-[#0a1632] m-0 leading-[1.1] tracking-tight max-w-[1000px] animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          Kiến tạo Thịnh vượng thông qua Bất động sản <span className="text-blue-600 italic">Cao cấp</span>
         </h1>
-        <p className="font-primary text-lg text-gray-500 m-0 max-w-[480px]">
-          Tìm kiếm, mua bán và cho thuê bất động sản dễ dàng
+
+        <p className="font-primary text-base md:text-lg text-gray-500 m-0 max-w-[600px] leading-relaxed animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-200">
+          Truy cập các danh sách độc quyền, tư vấn từ chuyên gia và sự hiện diện toàn cầu tại các thị trường uy tín nhất.
         </p>
-        <FormButton
-          id="btn-hero-register"
-          variant="primary"
-          onClick={() => setIsRegisterOpen(true)}
-        >
-          Đăng ký ngay
-        </FormButton>
+
+        <div className="flex flex-col sm:flex-row items-center gap-3 mt-4 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+          <button className="px-8 py-3.5 font-primary font-bold text-[#0a1632] hover:bg-gray-50 rounded-2xl transition-all h-auto border border-gray-100">
+            Xem báo cáo thị trường
+          </button>
+        </div>
       </main>
+
+      {/* Footer */}
+      <Footer />
 
       {/* Register Modal */}
       <Modal isOpen={isRegisterOpen} onClose={() => setIsRegisterOpen(false)}>
-        <RegisterModal 
-          onSwitchToLogin={handleSwitchToLogin} 
+        <RegisterModal
+          onSwitchToLogin={handleSwitchToLogin}
           onSuccess={handleRegisterSuccess}
         />
       </Modal>
 
       {/* Login Modal */}
       <Modal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)}>
-        <LoginModal onSwitchToRegister={handleSwitchToRegister} />
+        <LoginModal
+          onSwitchToRegister={handleSwitchToRegister}
+          onSuccess={handleLoginSuccess}
+        />
       </Modal>
 
       {/* Verify OTP Modal */}
       <Modal isOpen={isVerifyOtpOpen} onClose={() => setIsVerifyOtpOpen(false)}>
-        <VerifyOtpModal 
-          email={pendingEmail} 
+        <VerifyOtpModal
+          email={pendingEmail}
           onSuccess={handleVerifySuccess}
           onBackToLogin={() => {
             setIsVerifyOtpOpen(false);
@@ -153,6 +104,9 @@ export default function HomePage() {
           }}
         />
       </Modal>
+
+      {/* GLOBAL NOTIFICATIONS */}
+      <StatusModal />
     </div>
   );
 }

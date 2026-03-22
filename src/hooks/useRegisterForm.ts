@@ -3,6 +3,7 @@ import type React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/AuthService';
 import { AuthValidator } from '../utils/AuthValidator';
+import { useUIStore } from '../store/useUIStore';
 import type { RegisterFormState, FormErrors } from '../types/auth.types';
 
 const INITIAL_FORM_STATE: RegisterFormState = {
@@ -22,7 +23,7 @@ export function useRegisterForm() {
   const [formState, setFormState] = useState<RegisterFormState>(INITIAL_FORM_STATE);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { showStatus } = useUIStore();
   const navigate = useNavigate();
 
   const handleChange = (field: keyof RegisterFormState, value: string | boolean) => {
@@ -48,7 +49,6 @@ export function useRegisterForm() {
     e.preventDefault();
     setIsLoading(true);
     setErrors({});
-    setSuccessMessage(null);
 
     try {
       const result = await authService.register(formState);
@@ -59,7 +59,7 @@ export function useRegisterForm() {
       }
 
       if (result.response?.success) {
-        setSuccessMessage('Đăng ký thành công! Đang chuyển đến trang xác thực...');
+        showStatus('Đăng ký thành công', 'Chào mừng bạn! Vui lòng xác thực tài khoản để tiếp tục.', 'success');
         
         // Store email for OTP verification step
         localStorage.setItem('pending_auth_email', formState.email);
@@ -72,10 +72,11 @@ export function useRegisterForm() {
         return true;
       }
       return false;
-    } catch (error: any) {
-      setErrors({
-        general: error.message || 'Đăng ký thất bại. Vui lòng thử lại sau.',
-      });
+    } catch (error) {
+      const err = error as any;
+      const msg = err.message || 'Đăng ký thất bại. Vui lòng thử lại sau.';
+      setErrors({ general: msg });
+      showStatus('Lỗi đăng ký', msg, 'error');
       return false;
     } finally {
       setIsLoading(false);
@@ -86,7 +87,6 @@ export function useRegisterForm() {
     formState,
     errors,
     isLoading,
-    successMessage,
     handleChange,
     handleSubmit,
   };

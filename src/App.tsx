@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/home/HomePage';
-import LoginPage from './pages/auth/login/LoginPage';
-import RegisterPage from './pages/auth/register/RegisterPage';
-import VerifyOtpPage from './pages/auth/verify-otp/VerifyOtpPage';
+import ProfilePage from './pages/profile/ProfilePage';
+
 import { useAuthStore } from './store/useAuthStore';
+
+import { ToastContainer } from './components/ui/Toast';
 
 /**
  * App - main router entry point.
@@ -14,25 +15,22 @@ function App() {
 
   return (
     <Router>
+      <ToastContainer />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
         
-        {/* Auth Routes - Redirect to home if already logged in */}
+        {/* Protected Routes - Redirect to Home if not authenticated */}
         <Route 
-          path="/login" 
-          element={isAuthenticated ? <Navigate to="/" /> : <LoginPage />} 
+          path="/profile" 
+          element={isAuthenticated ? <ProfilePage /> : <Navigate to="/" />} 
         />
-        <Route 
-          path="/register" 
-          element={isAuthenticated ? <Navigate to="/" /> : <RegisterPage />} 
-        />
-        <Route path="/verify-otp" element={<VerifyOtpPage />} />
 
         {/* Catch-all - Redirect to home */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
+
   );
 }
 

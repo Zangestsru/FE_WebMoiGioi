@@ -16,17 +16,16 @@ export function VerifyOtpModal({ email, onSuccess, onBackToLogin }: VerifyOtpMod
     errors,
     isLoading,
     isResending,
-    successMessage,
     handleChange,
     handleSubmit,
     handleResend,
   } = useVerifyOtpForm(email);
 
   return (
-    <div className="flex h-full w-full flex-col sm:flex-row bg-white">
+    <div className="flex w-full flex-col sm:flex-row bg-white overflow-hidden">
       {/* LEFT: Image panel */}
       <div
-        className="relative w-full sm:w-[320px] shrink-0 bg-cover bg-center bg-no-repeat rounded-t-xl sm:rounded-none sm:rounded-l-xl overflow-hidden bg-[#2b3543] flex items-end p-6 h-[120px] sm:h-full"
+        className="relative w-full sm:w-[320px] shrink-0 bg-cover bg-center bg-no-repeat rounded-t-xl sm:rounded-none sm:rounded-l-xl overflow-hidden bg-[#2b3543] flex items-end p-6 h-[140px] sm:h-auto"
         style={{
           backgroundImage: import.meta.env.VITE_REGISTER_BG_IMAGE
             ? `url('${import.meta.env.VITE_REGISTER_BG_IMAGE}')`
@@ -50,13 +49,6 @@ export function VerifyOtpModal({ email, onSuccess, onBackToLogin }: VerifyOtpMod
             </p>
           </div>
 
-          {/* Success */}
-          {successMessage && (
-            <div className="px-4 py-2 rounded-md text-sm font-medium font-primary bg-[#d1fae5] text-[#065f46] border border-[#6ee7b7]" role="status">
-              {successMessage}
-            </div>
-          )}
-
           {/* General Error */}
           {errors.general && (
             <div className="px-4 py-2 rounded-md text-sm font-medium font-primary bg-[#fee2e2] text-[#991b1b] border border-[#fca5a5]" role="alert">
@@ -66,7 +58,7 @@ export function VerifyOtpModal({ email, onSuccess, onBackToLogin }: VerifyOtpMod
 
           <form onSubmit={async (e) => {
             await handleSubmit(e);
-            if (!errors.general && successMessage) {
+            if (!errors.general) {
               onSuccess?.();
             }
           }} noValidate className="flex flex-col gap-4 mt-2">

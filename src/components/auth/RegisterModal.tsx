@@ -16,7 +16,6 @@ export function RegisterModal({ onSwitchToLogin, onSuccess }: RegisterModalProps
     formState,
     errors,
     isLoading,
-    successMessage,
     handleChange,
     handleSubmit: originalHandleSubmit,
   } = useRegisterForm();
@@ -29,13 +28,11 @@ export function RegisterModal({ onSwitchToLogin, onSuccess }: RegisterModalProps
     }
   };
 
-  // We should actually modify useRegisterForm to return the result or accept a callback
-
   return (
-    <div className="flex h-full w-full flex-col sm:flex-row bg-white">
+    <div className="flex w-full flex-col sm:flex-row bg-white overflow-hidden">
       {/* LEFT: Image panel */}
       <div
-        className="relative w-full sm:w-[440px] shrink-0 bg-cover bg-center bg-no-repeat rounded-t-xl sm:rounded-none sm:rounded-l-xl overflow-hidden bg-[#2b3543] flex items-end p-6 h-[140px] sm:h-full"
+        className="relative w-full sm:w-[440px] shrink-0 bg-cover bg-center bg-no-repeat rounded-t-xl sm:rounded-none sm:rounded-l-xl overflow-hidden bg-[#2b3543] flex items-end p-6 h-[160px] sm:h-auto"
         style={{
           backgroundImage: import.meta.env.VITE_REGISTER_BG_IMAGE
             ? `url('${import.meta.env.VITE_REGISTER_BG_IMAGE}')`
@@ -53,13 +50,6 @@ export function RegisterModal({ onSwitchToLogin, onSuccess }: RegisterModalProps
       <div className="flex-1 w-full min-w-0 flex flex-col justify-center p-6 sm:px-8 sm:py-6 relative">
         <div className="flex flex-col gap-1 w-full">
           <h2 className="font-primary text-[33px] font-bold text-gray-900 m-0 mb-1 leading-tight">Đăng ký tài khoản mới</h2>
-
-          {/* Success */}
-          {successMessage && (
-            <div className="px-4 py-2 rounded-md text-sm font-medium font-primary bg-[#d1fae5] text-[#065f46] border border-[#6ee7b7] shrink-0" role="status">
-              {successMessage}
-            </div>
-          )}
 
           {/* General Error */}
           {errors.general && (

@@ -3,6 +3,7 @@ import type React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/AuthService';
 import { useAuthStore } from '../store/useAuthStore';
+import { useUIStore } from '../store/useUIStore';
 import type { LoginFormState, FormErrors } from '../types/auth.types';
 
 const INITIAL_FORM_STATE: LoginFormState = {
@@ -15,14 +16,14 @@ const INITIAL_FORM_STATE: LoginFormState = {
  * useLoginForm - Glue between UI and AuthService.
  * Manages login form state.
  */
-export function useLoginForm() {
+export function useLoginForm(onSuccess?: () => void) {
   const [formState, setFormState] = useState<LoginFormState>(INITIAL_FORM_STATE);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
   const navigate = useNavigate();
   const { setUser } = useAuthStore();
+  const { showStatus } = useUIStore();
 
   const handleChange = (field: keyof LoginFormState, value: string | boolean) => {
     setFormState((prev) => ({ ...prev, [field]: value }));
@@ -40,7 +41,6 @@ export function useLoginForm() {
     e.preventDefault();
     setIsLoading(true);
     setErrors({});
-    setSuccessMessage(null);
 
     try {
       const result = await authService.login(formState);
@@ -51,17 +51,23 @@ export function useLoginForm() {
       }
 
       if (result.response?.success) {
-        setSuccessMessage('Đăng nhập thành công!');
+        showStatus('Đăng nhập thành công', 'Chào mừng bạn quay trở lại hệ thống!', 'success');
         
         // Update Auth Store
         setUser(result.response.data);
         
-        // Redirect to Home
-        setTimeout(() => navigate('/'), 1000);
+        // Call success callback
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          // Redirect to Home if no callback
+          navigate('/');
+        }
       }
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as any;
       setErrors({
-        general: error.message || 'Đã xảy ra lỗi không xác định',
+        general: err.message || 'Đã xảy ra lỗi không xác định',
       });
     } finally {
       setIsLoading(false);
@@ -75,11 +81,16 @@ export function useLoginForm() {
       const response = await authService.loginWithGoogle(idToken);
       if (response.success) {
         setUser(response.data);
-        setSuccessMessage('Đăng nhập Google thành công!');
-        setTimeout(() => navigate('/'), 1000);
+        showStatus('Đăng nhập Google', 'Đăng nhập thông qua tài khoản Google thành công.', 'success');
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          navigate('/');
+        }
       }
-    } catch (error: any) {
-      setErrors({ general: error.message || 'Google login failed' });
+    } catch (error) {
+      const err = error as any;
+      setErrors({ general: err.message || 'Đăng nhập Google thất bại' });
     } finally {
       setIsLoading(false);
     }
@@ -92,11 +103,16 @@ export function useLoginForm() {
       const response = await authService.loginWithFacebook(accessToken);
       if (response.success) {
         setUser(response.data);
-        setSuccessMessage('Đăng nhập Facebook thành công!');
-        setTimeout(() => navigate('/'), 1000);
+        showStatus('Đăng nhập Facebook', 'Đăng nhập thông qua tài khoản Facebook thành công.', 'success');
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          navigate('/');
+        }
       }
-    } catch (error: any) {
-      setErrors({ general: error.message || 'Facebook login failed' });
+    } catch (error) {
+      const err = error as any;
+      setErrors({ general: err.message || 'Đăng nhập Facebook thất bại' });
     } finally {
       setIsLoading(false);
     }
@@ -106,7 +122,6 @@ export function useLoginForm() {
     formState,
     errors,
     isLoading,
-    successMessage,
     handleChange,
     handleSubmit,
     handleGoogleSuccess,

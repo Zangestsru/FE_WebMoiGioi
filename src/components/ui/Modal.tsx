@@ -5,13 +5,14 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
+  maxWidth?: string;
 }
 
 /**
  * Reusable Modal component using Tailwind.
  * Handles backdrop click, ESC key, body scroll lock.
  */
-export function Modal({ isOpen, onClose, children }: ModalProps) {
+export function Modal({ isOpen, onClose, children, maxWidth = "920px" }: ModalProps) {
   // Close on ESC key
   useEffect(() => {
     if (!isOpen) return;
@@ -38,7 +39,8 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
       aria-modal="true"
     >
       <div
-        className="relative bg-white rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.3)] max-w-[920px] w-full h-[580px] overflow-hidden animate-modal-slide sm:rounded-2xl"
+        className="relative bg-white rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.3)] w-full max-h-[90vh] overflow-y-auto animate-modal-slide sm:rounded-2xl"
+        style={{ maxWidth }}
         onClick={(e) => e.stopPropagation()}
       >
         <button

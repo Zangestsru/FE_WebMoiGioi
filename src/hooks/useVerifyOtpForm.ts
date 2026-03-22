@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/AuthService';
 import { useAuthStore } from '../store/useAuthStore';
+import { useUIStore } from '../store/useUIStore';
 import type { VerifyOtpFormState, FormErrors } from '../types/auth.types';
 
 /**
@@ -17,7 +18,7 @@ export function useVerifyOtpForm(initialEmail: string = '') {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
+  const { showStatus } = useUIStore();
 
   const navigate = useNavigate();
   const { setUser } = useAuthStore();
@@ -33,7 +34,6 @@ export function useVerifyOtpForm(initialEmail: string = '') {
     e.preventDefault();
     setIsLoading(true);
     setErrors({});
-    setSuccessMessage('');
 
     try {
       const result = await authService.verifyOtp(formState);
@@ -41,16 +41,18 @@ export function useVerifyOtpForm(initialEmail: string = '') {
       if (result.errors) {
         setErrors(result.errors);
       } else if (result.response?.success) {
-        setSuccessMessage('Xác thực tài khoản thành công!');
+        showStatus('Xác thực thành công', 'Chào mừng bạn! Đang chuyển hướng đăng nhập...', 'success');
         
         // Update Auth Store
         setUser(result.response.data);
         
         // Redirect after a brief delay
-        setTimeout(() => navigate('/'), 1500);
+        setTimeout(() => navigate('/'), 1000);
       }
-    } catch (error: any) {
-      setErrors({ general: error.message || 'Verification failed. Please try again.' });
+    } catch (error) {
+      const err = error as any;
+      const msg = err.message || 'Xác thực không thành công. Vui lòng thử lại sau.';
+      showStatus('Lỗi xác thực', msg, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -64,15 +66,16 @@ export function useVerifyOtpForm(initialEmail: string = '') {
 
     setIsResending(true);
     setErrors({});
-    setSuccessMessage('');
 
     try {
       const result = await authService.resendOtp(formState.email);
       if (result.success) {
-        setSuccessMessage('A new OTP has been sent to your email.');
+        showStatus('Gửi lại mã', 'Mã OTP mới đã được gửi đến email của bạn.', 'success');
       }
-    } catch (error: any) {
-      setErrors({ general: error.message || 'Failed to resend OTP.' });
+    } catch (error) {
+      const err = error as any;
+      const msg = err.message || 'Gửi lại mã OTP thất bại.';
+      showStatus('Gửi lại thất bại', msg, 'error');
     } finally {
       setIsResending(false);
     }
@@ -83,7 +86,6 @@ export function useVerifyOtpForm(initialEmail: string = '') {
     errors,
     isLoading,
     isResending,
-    successMessage,
     handleChange,
     handleSubmit,
     handleResend,
