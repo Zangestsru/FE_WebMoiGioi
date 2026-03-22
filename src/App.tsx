@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/home/HomePage';
 import ProfilePage from './pages/profile/ProfilePage';
+import BrokerRegistrationPage from './pages/user/BrokerRegistrationPage';
 
 import { useAuthStore } from './store/useAuthStore';
 
@@ -30,6 +31,10 @@ function App() {
         <Route 
           path="/profile" 
           element={isAuthenticated ? <ProfilePage /> : <Navigate to="/" />} 
+        />
+        <Route 
+          path="/user/register-broker" 
+          element={isAuthenticated ? <BrokerRegistrationPage /> : <Navigate to="/" />} 
         />
 
         {/* Admin Routes - Only accessible by ADMIN role */}
