@@ -1,70 +1,49 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Filter, Eye, CheckCircle, XCircle, X, Download } from "lucide-react";
 import { clsx } from "clsx";
 import { ImageWithFallback } from "../../components/ui/ImageWithFallback";
+import axiosClient from "../../api/axiosClient";
+import { useToastStore } from "../../store/useToastStore";
 
 // Mock Data
-const MOCK_REQUESTS = [
-  {
-    id: "REQ-001",
-    user: {
-      name: "Trần Văn An",
-      email: "an.tran@example.com",
-      avatar: "https://images.unsplash.com/photo-1652471943570-f3590a4e52ed?ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdCUyMG1hbnxlbnwxfHx8fDE3NzQwODM5NzF8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      phone: "+84 912 345 678"
-    },
-    dateApplied: "24 Thg 10, 2023",
-    experienceYears: 5,
-    specializedArea: "Quận 1, TP.HCM",
-    identityCard: "123456789",
-    licenseImage: "https://images.unsplash.com/photo-1768611873487-67930d5db1b8?ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvZmZpY2lhbCUyMGRvY3VtZW50JTIwcGFwZXIlMjBjZXJ0aWZpY2F0ZXxlbnwxfHx8fDE3NzQxNDE1ODB8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    status: "Chờ duyệt"
-  },
-  {
-    id: "REQ-002",
-    user: {
-      name: "Lê Thị Bình",
-      email: "binh.le@example.com",
-      avatar: "https://images.unsplash.com/photo-1689600944138-da3b150d9cb8?ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjB3b21hbnxlbnwxfHx8fDE3NzQwNzYyMzZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      phone: "+84 987 654 321"
-    },
-    dateApplied: "23 Thg 10, 2023",
-    experienceYears: 2,
-    specializedArea: "Quận 7, TP.HCM",
-    identityCard: "987654321",
-    licenseImage: "https://images.unsplash.com/photo-1768611873487-67930d5db1b8?ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvZmZpY2lhbCUyMGRvY3VtZW50JTIwcGFwZXIlMjBjZXJ0aWZpY2F0ZXxlbnwxfHx8fDE3NzQxNDE1ODB8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    status: "Chờ duyệt"
-  },
-  {
-    id: "REQ-003",
-    user: {
-      name: "Nguyễn Minh Trí",
-      email: "tri.nguyen@example.com",
-      avatar: "https://images.unsplash.com/photo-1625502709763-f5f3880c17ba?ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwb3J0cmFpdCUyMG1hbiUyMHN1aXR8ZW58MXx8fHwxNzc0MTQxNTg2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      phone: "+84 905 111 222"
-    },
-    dateApplied: "21 Thg 10, 2023",
-    experienceYears: 8,
-    specializedArea: "Thanh Xuân, Hà Nội",
-    identityCard: "112233445",
-    licenseImage: "https://images.unsplash.com/photo-1768611873487-67930d5db1b8?ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvZmZpY2lhbCUyMGRvY3VtZW50JTIwcGFwZXIlMjBjZXJ0aWZpY2F0ZXxlbnwxfHx8fDE3NzQxNDE1ODB8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    status: "Chờ duyệt"
-  }
-];
+// Mock Data removed.
 
 export function BrokerApprovals() {
-  const [requests, setRequests] = useState(MOCK_REQUESTS);
-  const [selectedRequest, setSelectedRequest] = useState<typeof MOCK_REQUESTS[0] | null>(null);
+  const [requests, setRequests] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [isRejecting, setIsRejecting] = useState(false);
 
-  const handleAction = (id: string, action: "Đã duyệt" | "Đã từ chối") => {
-    setRequests(requests.map(req => 
-      req.id === id ? { ...req, status: action } : req
-    ));
-    setSelectedRequest(null);
-    setRejectReason("");
-    setIsRejecting(false);
+  const fetchRequests = async () => {
+    try {
+      setIsLoading(true);
+      const res = await axiosClient.get("/user/admin/pending-brokers");
+      setRequests(res.data?.data || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  const handleAction = async (id: string, action: "Đã duyệt" | "Đã từ chối") => {
+    try {
+      const approve = action === "Đã duyệt";
+      await axiosClient.patch(`/user/admin/approve-broker/${id}`, { approve });
+
+      useToastStore.getState().addToast(approve ? "Đã duyệt Môi giới" : "Đã từ chối", "success");
+      setRequests(requests.filter(req => req.id !== id));
+      setSelectedRequest(null);
+      setRejectReason("");
+      setIsRejecting(false);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -104,27 +83,29 @@ export function BrokerApprovals() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {requests.map((req) => (
+              {isLoading ? (
+                <tr><td colSpan={6} className="py-12 text-center text-slate-400">Đang tải biểu mẫu...</td></tr>
+              ) : requests.map((req) => (
                 <tr key={req.id} className="hover:bg-slate-50 transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <ImageWithFallback 
-                        src={req.user.avatar} 
-                        alt={req.user.name} 
+                        src={req.profile?.avatarUrl || "https://images.unsplash.com/photo-1625502709763-f5f3880c17ba?ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwb3J0cmFpdCUyMG1hbiUyMHN1aXR8ZW58MXx8fHwxNzc0MTQxNTg2fDA"} 
+                        alt={req.profile?.displayName || req.email} 
                         className="w-10 h-10 rounded-full object-cover border border-slate-200"
                       />
                       <div>
-                        <div className="font-medium text-slate-900">{req.user.name}</div>
-                        <div className="text-xs text-slate-500">{req.user.email}</div>
+                        <div className="font-medium text-slate-900">{req.profile?.displayName || "Môi giới"}</div>
+                        <div className="text-xs text-slate-500">{req.email}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{req.dateApplied}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">{req.experienceYears} Năm</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{new Date(req.createdAt).toLocaleDateString("vi-VN")}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">Chi tiết chi tiết</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="relative group/img cursor-pointer w-16 h-12 rounded-md overflow-hidden border border-slate-200">
                       <ImageWithFallback
-                        src={req.licenseImage}
+                        src={req.profile?.socialLinks?.brokerLicenseUrl || "https://images.unsplash.com/photo-1768611873487-67930d5db1b8"}
                         alt="License Thumbnail"
                         className="w-full h-full object-cover"
                       />
@@ -135,16 +116,13 @@ export function BrokerApprovals() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={clsx(
-                      "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border",
-                      req.status === 'Chờ duyệt' ? "bg-amber-50 text-amber-700 border-amber-200" : 
-                      req.status === 'Đã duyệt' ? "bg-green-50 text-green-700 border-green-200" : 
-                      "bg-red-50 text-red-700 border-red-200"
+                      "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-amber-50 text-amber-700 border-amber-200"
                     )}>
-                      {req.status}
+                      Chờ duyệt
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
-                    {req.status === 'Chờ duyệt' ? (
+                    {(req.status === 'PENDING_VERIFICATION' || req.status === 'Chờ duyệt') ? (
                       <>
                         <button
                           onClick={() => { setSelectedRequest(req); setIsRejecting(false); }}
@@ -214,16 +192,16 @@ export function BrokerApprovals() {
               {/* Applicant Info */}
               <div className="flex items-start gap-4">
                 <ImageWithFallback 
-                  src={selectedRequest.user.avatar} 
-                  alt={selectedRequest.user.name} 
+                  src={selectedRequest.profile?.avatarUrl || "https://images.unsplash.com/photo-1625502709763-f5f3880c17ba"} 
+                  alt={selectedRequest.profile?.displayName || selectedRequest.email} 
                   className="w-16 h-16 rounded-full object-cover border border-slate-200"
                 />
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900">{selectedRequest.user.name}</h3>
+                  <h3 className="text-xl font-bold text-slate-900">{selectedRequest.profile?.displayName || "Môi giới"}</h3>
                   <div className="flex flex-wrap gap-x-6 gap-y-2 mt-2 text-sm text-slate-600">
-                    <span className="flex items-center gap-1.5"><strong className="text-slate-900">Email:</strong> {selectedRequest.user.email}</span>
-                    <span className="flex items-center gap-1.5"><strong className="text-slate-900">SĐT:</strong> {selectedRequest.user.phone}</span>
-                    <span className="flex items-center gap-1.5"><strong className="text-slate-900">Ngày ĐK:</strong> {selectedRequest.dateApplied}</span>
+                    <span className="flex items-center gap-1.5"><strong className="text-slate-900">Email:</strong> {selectedRequest.email}</span>
+                    <span className="flex items-center gap-1.5"><strong className="text-slate-900">SĐT:</strong> {selectedRequest.profile?.zaloContactPhone || "N/A"}</span>
+                    <span className="flex items-center gap-1.5"><strong className="text-slate-900">Ngày ĐK:</strong> {new Date(selectedRequest.createdAt).toLocaleDateString("vi-VN")}</span>
                   </div>
                 </div>
               </div>
@@ -231,14 +209,10 @@ export function BrokerApprovals() {
               {/* Professional Details */}
               <div>
                 <h4 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">Thông tin Nghề nghiệp</h4>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                    <p className="text-xs text-slate-500 mb-1">Số năm Kinh nghiệm</p>
-                    <p className="font-semibold text-slate-900">{selectedRequest.experienceYears} Năm</p>
-                  </div>
-                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                    <p className="text-xs text-slate-500 mb-1">Khu vực Chuyên môn</p>
-                    <p className="font-semibold text-slate-900">{selectedRequest.specializedArea}</p>
+                    <p className="text-xs text-slate-500 mb-1">Mô tả lý lịch (Kinh nghiệm & Khu vực)</p>
+                    <p className="font-semibold text-slate-900">{selectedRequest.profile?.bio || "Chưa cung cấp"}</p>
                   </div>
                 </div>
               </div>
@@ -248,23 +222,46 @@ export function BrokerApprovals() {
                 <h4 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">Tài liệu đã Nộp</h4>
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-slate-700 mb-2">Số CMND/CCCD: <span className="font-normal">{selectedRequest.identityCard}</span></p>
+                    <p className="text-sm font-medium text-slate-700 mb-2">Số CMND/CCCD: <span className="font-normal">{selectedRequest.profile?.identityCardNumber || "CCCD"}</span></p>
                   </div>
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-medium text-slate-700">Chứng chỉ Hành nghề Môi giới</p>
-                      <button className="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
-                        <Download size={14} /> Tải xuống
-                      </button>
+                    <p className="text-sm font-medium text-slate-700">Chứng chỉ Hành nghề Môi giới / Link ảnh</p>
                     </div>
-                    <div className="w-full aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
+                    <div className="w-full aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100 mb-4">
                       <ImageWithFallback
-                        src={selectedRequest.licenseImage}
+                        src={selectedRequest.profile?.socialLinks?.brokerLicenseUrl || "https://images.unsplash.com/photo-1768611873487-67930d5db1b8"}
                         alt="License Document"
                         className="w-full h-full object-cover"
                       />
                     </div>
                   </div>
+
+                  {selectedRequest.profile?.socialLinks?.idFrontUrl && (
+                    <div>
+                      <p className="text-sm font-medium text-slate-700 mb-2">Ảnh CMND/CCCD (Mặt trước)</p>
+                      <div className="w-full aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100 mb-4">
+                        <ImageWithFallback
+                          src={selectedRequest.profile.socialLinks.idFrontUrl}
+                          alt="ID Front"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedRequest.profile?.socialLinks?.idBackUrl && (
+                    <div>
+                      <p className="text-sm font-medium text-slate-700 mb-2">Ảnh CMND/CCCD (Mặt sau)</p>
+                      <div className="w-full aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
+                        <ImageWithFallback
+                          src={selectedRequest.profile.socialLinks.idBackUrl}
+                          alt="ID Back"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -290,7 +287,7 @@ export function BrokerApprovals() {
                 Hủy
               </button>
               
-              {selectedRequest.status === 'Chờ duyệt' && (
+              {(selectedRequest.status === 'PENDING_VERIFICATION' || selectedRequest.status === 'Chờ duyệt') && (
                 isRejecting ? (
                   <button 
                     onClick={() => handleAction(selectedRequest.id, "Đã từ chối")}

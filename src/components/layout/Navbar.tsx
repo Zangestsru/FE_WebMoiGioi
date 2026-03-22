@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, LogOut, User as UserIcon, ChevronDown, Menu, X, Briefcase } from 'lucide-react';
+import { Search, LogOut, User as UserIcon, ChevronDown, Menu, X, Briefcase, LayoutDashboard } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 
 interface NavbarProps {
@@ -103,6 +103,17 @@ export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
                       Trở thành môi giới
                     </Link>
                   )}
+                  {user?.accountType === 'AGENT' && (
+                    <Link
+                      to="/agent/dashboard"
+                      target="_blank"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="w-full flex items-center gap-3.5 px-5 py-3 hover:bg-gray-50 transition-colors font-primary text-sm font-bold text-gray-700"
+                    >
+                      <LayoutDashboard size={18} />
+                      Dashboard Môi Giới
+                    </Link>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3.5 px-5 py-3 text-red-500 hover:bg-red-50 transition-colors font-primary text-sm font-bold"
@@ -177,6 +188,17 @@ export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
                   >
                     <Briefcase size={20} />
                     Trở thành môi giới
+                  </Link>
+                )}
+                {user?.accountType === 'AGENT' && (
+                  <Link
+                    to="/agent/dashboard"
+                    target="_blank"
+                    className="font-primary text-lg font-bold text-gray-900 border-b border-gray-50 pb-4 flex items-center gap-3"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <LayoutDashboard size={20} />
+                    Dashboard Môi Giới
                   </Link>
                 )}
                 <button

@@ -119,7 +119,7 @@ export function AdminLayout() {
             <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-3">Chính</div>
             <NavItem href="/admin" icon={LayoutDashboard} label="Bảng điều khiển" isActive={location.pathname === "/admin"} />
             
-            <NavItem href="#listing" icon={CheckSquare} label="Duyệt Tin đăng" isActive={false} />
+            <NavItem href="/admin/listing-approvals" icon={CheckSquare} label="Duyệt Tin đăng" isActive={location.pathname === "/admin/listing-approvals"} />
             
             <NavItem href="#category" icon={Tags} label="Quản lý Danh mục" isActive={false} />
             
