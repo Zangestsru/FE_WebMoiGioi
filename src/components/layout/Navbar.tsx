@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, LogOut, User as UserIcon, ChevronDown, Menu, X } from 'lucide-react';
+import { Search, LogOut, User as UserIcon, ChevronDown, Menu, X, Briefcase } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 
 interface NavbarProps {
@@ -93,6 +93,16 @@ export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
                     <UserIcon size={18} />
                     Hồ sơ
                   </Link>
+                  {user?.accountType === 'MEMBER' && (
+                    <Link
+                      to="/user/register-broker"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="w-full flex items-center gap-3.5 px-5 py-3 hover:bg-gray-50 transition-colors font-primary text-sm font-bold text-gray-700"
+                    >
+                      <Briefcase size={18} />
+                      Trở thành môi giới
+                    </Link>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3.5 px-5 py-3 text-red-500 hover:bg-red-50 transition-colors font-primary text-sm font-bold"
@@ -159,6 +169,16 @@ export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
                   <UserIcon size={20} />
                   Hồ sơ
                 </Link>
+                {user?.accountType === 'MEMBER' && (
+                  <Link
+                    to="/user/register-broker"
+                    className="font-primary text-lg font-bold text-gray-900 border-b border-gray-50 pb-4 flex items-center gap-3"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Briefcase size={20} />
+                    Trở thành môi giới
+                  </Link>
+                )}
                 <button
                   onClick={() => {
                     handleLogout();

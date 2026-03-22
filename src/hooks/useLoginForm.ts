@@ -54,13 +54,18 @@ export function useLoginForm(onSuccess?: () => void) {
         showStatus('Đăng nhập thành công', 'Chào mừng bạn quay trở lại hệ thống!', 'success');
         
         // Update Auth Store
-        setUser(result.response.data);
+        const userData = result.response.data;
+        setUser(userData);
         
-        // Call success callback
+        // Call success callback to close modal if it exists
         if (onSuccess) {
           onSuccess();
-        } else {
-          // Redirect to Home if no callback
+        }
+        
+        // Auto-redirect for ADMINs, otherwise go to home page if not in a modal
+        if (userData.accountType === 'ADMIN') {
+          navigate('/admin');
+        } else if (!onSuccess) {
           navigate('/');
         }
       }
@@ -80,11 +85,17 @@ export function useLoginForm(onSuccess?: () => void) {
     try {
       const response = await authService.loginWithGoogle(idToken);
       if (response.success) {
-        setUser(response.data);
+        const userData = response.data;
+        setUser(userData);
         showStatus('Đăng nhập Google', 'Đăng nhập thông qua tài khoản Google thành công.', 'success');
+        
         if (onSuccess) {
           onSuccess();
-        } else {
+        }
+        
+        if (userData.accountType === 'ADMIN') {
+          navigate('/admin');
+        } else if (!onSuccess) {
           navigate('/');
         }
       }
@@ -102,11 +113,17 @@ export function useLoginForm(onSuccess?: () => void) {
     try {
       const response = await authService.loginWithFacebook(accessToken);
       if (response.success) {
-        setUser(response.data);
+        const userData = response.data;
+        setUser(userData);
         showStatus('Đăng nhập Facebook', 'Đăng nhập thông qua tài khoản Facebook thành công.', 'success');
+        
         if (onSuccess) {
           onSuccess();
-        } else {
+        }
+        
+        if (userData.accountType === 'ADMIN') {
+          navigate('/admin');
+        } else if (!onSuccess) {
           navigate('/');
         }
       }
