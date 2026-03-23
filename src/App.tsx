@@ -12,6 +12,13 @@ import { AdminRoute } from './components/auth/AdminRoute';
 import { AdminLayout } from './pages/admin/AdminLayout';
 import { Dashboard } from './pages/admin/Dashboard';
 import { BrokerApprovals } from './pages/admin/BrokerApprovals';
+import { ListingApprovals } from './pages/admin/ListingApprovals';
+
+// Agent imports
+import { AgentRoute } from './components/auth/AgentRoute';
+import { AgentLayout } from './pages/agent/AgentLayout';
+import { AgentDashboard } from './pages/agent/AgentDashboard';
+import { AgentPostPage } from './pages/agent/AgentPostPage';
 
 /**
  * App - main router entry point.
@@ -37,7 +44,6 @@ function App() {
           element={isAuthenticated ? <BrokerRegistrationPage /> : <Navigate to="/" />} 
         />
 
-        {/* Admin Routes - Only accessible by ADMIN role */}
         <Route
           path="/admin"
           element={
@@ -48,6 +54,23 @@ function App() {
         >
           <Route index element={<Dashboard />} />
           <Route path="broker-approvals" element={<BrokerApprovals />} />
+          <Route path="listing-approvals" element={<ListingApprovals />} />
+        </Route>
+
+        {/* Agent Routes - Only accessible by AGENT role */}
+        <Route
+          path="/agent"
+          element={
+            <AgentRoute>
+              <AgentLayout />
+            </AgentRoute>
+          }
+        >
+          <Route index element={<AgentDashboard />} />
+          <Route path="dashboard" element={<AgentDashboard />} />
+          <Route path="post" element={<AgentPostPage />} />
+          <Route path="edit/:id" element={<AgentPostPage />} />
+          {/* Clients, Analytics, Settings routes placeholder... */}
         </Route>
 
         {/* Catch-all - Redirect to home */}

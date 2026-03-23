@@ -4,6 +4,8 @@ import { CheckCircle2, UploadCloud, FileText, BadgeCheck, AlertCircle, Phone, Ma
 import { clsx } from "clsx";
 import { Navbar } from "../../components/layout/Navbar";
 import { useNavigate } from "react-router-dom";
+import axiosClient from "../../api/axiosClient";
+import { useToastStore } from "../../store/useToastStore";
 
 type BrokerFormData = {
   fullName: string;
@@ -22,10 +24,27 @@ export default function BrokerRegistrationPage() {
   const navigate = useNavigate();
 
   const onSubmit = async (data: BrokerFormData) => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log("Submitted Data:", data);
-    setIsSubmitted(true);
+    try {
+      const formData = new FormData();
+      formData.append("fullName", data.fullName);
+      formData.append("phoneNumber", data.phoneNumber);
+      formData.append("experienceYears", data.experienceYears.toString());
+      formData.append("specializedArea", data.specializedArea);
+      
+      if (data.idFront?.[0]) formData.append("idFront", data.idFront[0]);
+      if (data.idBack?.[0]) formData.append("idBack", data.idBack[0]);
+      if (data.brokerLicense?.[0]) formData.append("brokerLicense", data.brokerLicense[0]);
+
+      await axiosClient.post("/user/register-broker", formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      useToastStore.getState().addToast("Nộp đơn đăng ký thành công", "success");
+      setIsSubmitted(true);
+    } catch (err) {
+      console.error(err);
+      useToastStore.getState().addToast("Lỗi nộp đơn đăng ký", "error");
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, name: string) => {
