@@ -105,12 +105,15 @@ export function AdminLayout() {
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="p-6 hidden md:block">
-          <Link to="/admin" className="font-bold text-2xl text-blue-600 tracking-tight flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
-               R
+        <div className="h-[72px] flex items-center px-6 border-b border-slate-200/80 hidden md:flex">
+          <Link to="/admin" className="flex items-center">
+            <div className="w-10 h-10 bg-[#1E88E5] rounded-xl flex items-center justify-center shadow-sm mr-3">
+              <LayoutDashboard size={20} className="text-white" />
             </div>
-            AdminBĐS
+            <div>
+              <h1 className="text-[15px] font-black text-slate-800 leading-tight tracking-wide">LuxAdmin</h1>
+              <p className="text-[10px] font-bold text-slate-400 tracking-wider">REAL ESTATE</p>
+            </div>
           </Link>
         </div>
 
@@ -179,7 +182,7 @@ export function AdminLayout() {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-h-0 w-full">
         {/* Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 sticky top-0 z-30">
+        <header className="h-[72px] bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 sticky top-0 z-30">
           <div className="flex-1 flex items-center">
             <div className="relative w-full max-w-md hidden md:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { UploadCloud, X, ArrowLeft } from 'lucide-react';
 import { listingApi } from '../../api/listing.api';
+import { locationApi } from '../../api/location.api';
 import { useToastStore } from '../../store/useToastStore';
 
 export function AgentPostPage() {
@@ -17,11 +18,21 @@ export function AgentPostPage() {
     addressDisplay: '',
     price: '',
     areaGross: '',
-    propertyTypeId: ''
+    propertyTypeId: '',
+    provinceCode: '',
+    provinceName: '',
+    districtCode: '',
+    districtName: '',
+    wardCode: '',
+    wardName: ''
   });
   
   // Property Types State
   const [propertyTypes, setPropertyTypes] = useState<{id: number, name: string}[]>([]);
+  
+  // Location States
+  const [provinces, setProvinces] = useState<{name: string, code: number}[]>([]);
+  const [wards, setWards] = useState<any[]>([]);
 
   // Images handling
   const [images, setImages] = useState<File[]>([]);
@@ -42,8 +53,24 @@ export function AgentPostPage() {
             addressDisplay: data.addressDisplay,
             price: data.price ? data.price.toString() : '',
             areaGross: data.areaGross ? data.areaGross.toString() : '',
-            propertyTypeId: data.propertyTypeId ? data.propertyTypeId.toString() : ''
+            propertyTypeId: data.propertyTypeId ? data.propertyTypeId.toString() : '',
+            provinceCode: data.provinceCode || '',
+            provinceName: data.provinceName || '',
+            districtCode: data.districtCode || '',
+            districtName: data.districtName || '',
+            wardCode: data.wardCode || '',
+            wardName: data.wardName || ''
           });
+          
+          // Pre-fetch wards if edit mode
+          if (data.provinceCode) {
+             try {
+                const wardsData = await locationApi.getWards(parseInt(data.provinceCode));
+                setWards(wardsData || []);
+             } catch (err) {
+                 console.error("Failed to pre-fetch location tree", err);
+             }
+          }
           
           if (data.media && data.media.length > 0) {
             const urls = data.media.map((m: any) => m.originalUrl);
@@ -69,8 +96,55 @@ export function AgentPostPage() {
         console.error("Failed to fetch property types", err);
       }
     };
+    
+    const fetchProvinces = async () => {
+      try {
+        const data = await locationApi.getProvinces();
+        setProvinces(data);
+      } catch (err) {
+        console.error("Failed to fetch provinces", err);
+      }
+    };
+
     fetchTypes();
+    fetchProvinces();
   }, []);
+
+  const handleProvinceChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const code = parseInt(e.target.value);
+    const selected = provinces.find(p => p.code === code);
+    if (selected) {
+      setFormData(prev => ({
+        ...prev,
+        provinceCode: code.toString(),
+        provinceName: selected.name,
+        districtCode: '',
+        districtName: '',
+        wardCode: '',
+        wardName: ''
+      }));
+      try {
+        const wardsData = await locationApi.getWards(code);
+        setWards(wardsData || []);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
+
+  const handleWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const code = parseInt(e.target.value);
+    const selected = wards.find((w: any) => w.code === code);
+    if (selected) {
+      setFormData(prev => ({
+        ...prev,
+        wardCode: code.toString(),
+        wardName: selected.name,
+        districtCode: selected.district_code ? selected.district_code.toString() : '',
+        districtName: selected.district_name || ''
+      }));
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -111,7 +185,7 @@ export function AgentPostPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.price || !formData.addressDisplay || !formData.propertyTypeId) {
+    if (!formData.title || !formData.price || !formData.addressDisplay || !formData.propertyTypeId || !formData.provinceCode || !formData.districtCode || !formData.wardCode) {
       useToastStore.getState().addToast("Vui lòng điền đầy đủ các trường bắt buộc (*)", "error");
       return;
     }
@@ -127,6 +201,8 @@ export function AgentPostPage() {
         if (value) submitData.append(key, value);
       });
       
+      console.log("Submitting FormData:", Object.fromEntries(submitData.entries()));
+
       images.forEach(image => {
         submitData.append('images', image);
       });
@@ -283,6 +359,44 @@ export function AgentPostPage() {
                 placeholder="VD: 150" />
             </div>
 
+            {/* Location Selects */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2">
+              <div>
+                <label className="block text-[14px] font-black text-gray-900 mb-2 uppercase tracking-wide">
+                  Tỉnh/Thành <span className="text-red-500">*</span>
+                </label>
+                <select 
+                  name="provinceCode"
+                  value={formData.provinceCode}
+                  onChange={handleProvinceChange}
+                  className="w-full bg-[#F3F4F6] border-none rounded-2xl p-4 font-bold text-[15px] focus:ring-2 focus:ring-[#cfb53b] outline-none transition-all text-gray-900 appearance-none"
+                >
+                  <option value="" disabled>-- Chọn Tỉnh/Thành --</option>
+                  {provinces.map(p => (
+                    <option key={p.code} value={p.code}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[14px] font-black text-gray-900 mb-2 uppercase tracking-wide">
+                  Phường/Xã <span className="text-red-500">*</span>
+                </label>
+                <select 
+                  name="wardCode"
+                  value={formData.wardCode}
+                  onChange={handleWardChange}
+                  disabled={!formData.provinceCode}
+                  className="w-full bg-[#F3F4F6] border-none rounded-2xl p-4 font-bold text-[15px] focus:ring-2 focus:ring-[#cfb53b] outline-none transition-all text-gray-900 appearance-none disabled:opacity-50"
+                >
+                  <option value="" disabled>-- Chọn Phường/Xã --</option>
+                  {wards.map((w: any) => (
+                    <option key={w.code} value={w.code}>{w.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             <div className="md:col-span-2">
               <label className="block text-[14px] font-black text-gray-900 mb-2 uppercase tracking-wide">
                 Địa chỉ chi tiết <span className="text-red-500">*</span>
@@ -293,7 +407,7 @@ export function AgentPostPage() {
                 value={formData.addressDisplay}
                 onChange={handleInputChange}
                 className="w-full bg-[#F3F4F6] border-none rounded-2xl p-4 font-bold text-[15px] focus:ring-2 focus:ring-[#cfb53b] outline-none transition-all placeholder-gray-400 text-gray-900" 
-                placeholder="VD: Số nhà, Tên đường, Phường, Quận, Thành phố..." />
+                placeholder="VD: Số nhà, Tên đường..." />
             </div>
 
             <div className="md:col-span-2">

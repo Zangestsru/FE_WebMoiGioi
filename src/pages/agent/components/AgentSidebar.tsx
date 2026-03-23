@@ -22,8 +22,14 @@ export function AgentSidebar() {
 
   return (
     <div className="w-[280px] bg-white border-r border-[#E5E7EB] h-full flex flex-col shrink-0 flex-shrink-0 relative z-20 hidden md:flex font-primary shadow-sm">
-      <div className="h-[90px] flex items-center px-8">
-         {/* Top padding / empty space like design */}
+      <div className="h-[72px] flex items-center px-8 border-b border-gray-100/80">
+          <div className="w-11 h-11 bg-[#1E88E5] rounded-xl flex items-center justify-center shadow-sm mr-3">
+              <LayoutDashboard size={22} className="text-white" />
+          </div>
+          <div>
+              <h1 className="text-[16px] font-black text-gray-900 leading-tight tracking-wide">LuxAgent</h1>
+              <p className="text-[11px] font-bold text-gray-400 tracking-wider">REAL ESTATE</p>
+          </div>
       </div>
 
       <div className="flex-1 py-4 px-6 flex flex-col gap-2 overflow-y-auto mt-2">
