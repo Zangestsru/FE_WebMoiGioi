@@ -21,8 +21,6 @@ export function AgentPostPage() {
     propertyTypeId: '',
     provinceCode: '',
     provinceName: '',
-    districtCode: '',
-    districtName: '',
     wardCode: '',
     wardName: ''
   });
@@ -56,8 +54,6 @@ export function AgentPostPage() {
             propertyTypeId: data.propertyTypeId ? data.propertyTypeId.toString() : '',
             provinceCode: data.provinceCode || '',
             provinceName: data.provinceName || '',
-            districtCode: data.districtCode || '',
-            districtName: data.districtName || '',
             wardCode: data.wardCode || '',
             wardName: data.wardName || ''
           });
@@ -65,11 +61,9 @@ export function AgentPostPage() {
           // Pre-fetch wards if edit mode
           if (data.provinceCode) {
              try {
-                const wardsData = await locationApi.getWards(parseInt(data.provinceCode));
-                setWards(wardsData || []);
-             } catch (err) {
-                 console.error("Failed to pre-fetch location tree", err);
-             }
+                const provinceData = await locationApi.getProvince(parseInt(data.provinceCode), 2);
+                setWards(provinceData?.wards || []);
+             } catch { /* ward loading failed silently, user can re-select province */ }
           }
           
           if (data.media && data.media.length > 0) {
@@ -101,9 +95,7 @@ export function AgentPostPage() {
       try {
         const data = await locationApi.getProvinces();
         setProvinces(data);
-      } catch (err) {
-        console.error("Failed to fetch provinces", err);
-      }
+      } catch { /* provinces loading failed */ }
     };
 
     fetchTypes();
@@ -118,17 +110,13 @@ export function AgentPostPage() {
         ...prev,
         provinceCode: code.toString(),
         provinceName: selected.name,
-        districtCode: '',
-        districtName: '',
         wardCode: '',
         wardName: ''
       }));
       try {
-        const wardsData = await locationApi.getWards(code);
-        setWards(wardsData || []);
-      } catch (err) {
-        console.error(err);
-      }
+        const provinceData = await locationApi.getProvince(code, 2);
+        setWards(provinceData?.wards || []);
+      } catch { /* wards loading failed */ }
     }
   };
 
@@ -139,9 +127,7 @@ export function AgentPostPage() {
       setFormData(prev => ({
         ...prev,
         wardCode: code.toString(),
-        wardName: selected.name,
-        districtCode: selected.district_code ? selected.district_code.toString() : '',
-        districtName: selected.district_name || ''
+        wardName: selected.name
       }));
     }
   };
@@ -185,7 +171,7 @@ export function AgentPostPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.price || !formData.addressDisplay || !formData.propertyTypeId || !formData.provinceCode || !formData.districtCode || !formData.wardCode) {
+    if (!formData.title || !formData.price || !formData.addressDisplay || !formData.propertyTypeId || !formData.provinceCode || !formData.wardCode) {
       useToastStore.getState().addToast("Vui lòng điền đầy đủ các trường bắt buộc (*)", "error");
       return;
     }
@@ -201,7 +187,7 @@ export function AgentPostPage() {
         if (value) submitData.append(key, value);
       });
       
-      console.log("Submitting FormData:", Object.fromEntries(submitData.entries()));
+
 
       images.forEach(image => {
         submitData.append('images', image);
