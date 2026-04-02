@@ -1,24 +1,32 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import HomePage from './pages/home/HomePage';
-import ProfilePage from './pages/profile/ProfilePage';
-import BrokerRegistrationPage from './pages/user/BrokerRegistrationPage';
+import { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import HomePage from "./pages/home/HomePage";
+import ProfilePage from "./pages/profile/ProfilePage";
+import BrokerRegistrationPage from "./pages/user/BrokerRegistrationPage";
+import ChatPage from "./pages/chat/ChatPage";
 
-import { useAuthStore } from './store/useAuthStore';
+import { useAuthStore } from "./store/useAuthStore";
+import { useSocketStore } from "./store/useSocketStore";
 
-import { ToastContainer } from './components/ui/Toast';
+import { ToastContainer } from "./components/ui/Toast";
 
 // Admin imports
-import { AdminRoute } from './components/auth/AdminRoute';
-import { AdminLayout } from './pages/admin/AdminLayout';
-import { Dashboard } from './pages/admin/Dashboard';
-import { BrokerApprovals } from './pages/admin/BrokerApprovals';
-import { ListingApprovals } from './pages/admin/ListingApprovals';
+import { AdminRoute } from "./components/auth/AdminRoute";
+import { AdminLayout } from "./pages/admin/AdminLayout";
+import { Dashboard } from "./pages/admin/Dashboard";
+import { BrokerApprovals } from "./pages/admin/BrokerApprovals";
+import { ListingApprovals } from "./pages/admin/ListingApprovals";
 
 // Agent imports
-import { AgentRoute } from './components/auth/AgentRoute';
-import { AgentLayout } from './pages/agent/AgentLayout';
-import { AgentDashboard } from './pages/agent/AgentDashboard';
-import { AgentPostPage } from './pages/agent/AgentPostPage';
+import { AgentRoute } from "./components/auth/AgentRoute";
+import { AgentLayout } from "./pages/agent/AgentLayout";
+import { AgentDashboard } from "./pages/agent/AgentDashboard";
+import { AgentPostPage } from "./pages/agent/AgentPostPage";
 
 /**
  * App - main router entry point.
@@ -26,6 +34,16 @@ import { AgentPostPage } from './pages/agent/AgentPostPage';
  */
 function App() {
   const { isAuthenticated } = useAuthStore();
+  const { connect, disconnect } = useSocketStore();
+
+  // Quản lý kết nối socket dựa trên trạng thái đăng nhập
+  useEffect(() => {
+    if (isAuthenticated) {
+      connect();
+    } else {
+      disconnect();
+    }
+  }, [isAuthenticated, connect, disconnect]);
 
   return (
     <Router>
@@ -33,15 +51,21 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
-        
+
         {/* Protected Routes - Redirect to Home if not authenticated */}
-        <Route 
-          path="/profile" 
-          element={isAuthenticated ? <ProfilePage /> : <Navigate to="/" />} 
+        <Route
+          path="/profile"
+          element={isAuthenticated ? <ProfilePage /> : <Navigate to="/" />}
         />
-        <Route 
-          path="/user/register-broker" 
-          element={isAuthenticated ? <BrokerRegistrationPage /> : <Navigate to="/" />} 
+        <Route
+          path="/user/register-broker"
+          element={
+            isAuthenticated ? <BrokerRegistrationPage /> : <Navigate to="/" />
+          }
+        />
+        <Route
+          path="/chat"
+          element={isAuthenticated ? <ChatPage /> : <Navigate to="/" />}
         />
 
         <Route

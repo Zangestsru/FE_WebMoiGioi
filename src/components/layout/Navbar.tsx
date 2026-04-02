@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, LogOut, User as UserIcon, ChevronDown, Menu, X, Briefcase, LayoutDashboard } from 'lucide-react';
+import { Search, LogOut, User as UserIcon, ChevronDown, Menu, X, Briefcase, LayoutDashboard, MessageCircle } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 
 interface NavbarProps {
@@ -8,7 +8,7 @@ interface NavbarProps {
   onRegisterClick: () => void;
 }
 
-export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
+export function Navbar({ onLoginClick, onRegisterClick }: Readonly<NavbarProps>) {
   const { user, isAuthenticated, logout } = useAuthStore();
   const navigate = useNavigate();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -92,6 +92,14 @@ export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
                   >
                     <UserIcon size={18} />
                     Hồ sơ
+                  </Link>
+                  <Link
+                    to="/chat"
+                    onClick={() => setIsUserMenuOpen(false)}
+                    className="w-full flex items-center gap-3.5 px-5 py-3 hover:bg-gray-50 transition-colors font-primary text-sm font-bold text-gray-700"
+                  >
+                    <MessageCircle size={18} />
+                    Tin nhắn
                   </Link>
                   {user?.accountType === 'MEMBER' && (
                     <Link
@@ -179,6 +187,14 @@ export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
                 >
                   <UserIcon size={20} />
                   Hồ sơ
+                </Link>
+                <Link
+                  to="/chat"
+                  className="font-primary text-lg font-bold text-gray-900 border-b border-gray-50 pb-4 flex items-center gap-3"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <MessageCircle size={20} />
+                  Tin nhắn
                 </Link>
                 {user?.accountType === 'MEMBER' && (
                   <Link

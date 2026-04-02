@@ -6,6 +6,16 @@
   --color-primary-disabled: #9b93f0;
   --color-form: #D6E4F7;
   --color-hero: #0a1632;
+  --color-chat-gold: #d4af37;
+  --color-chat-heading: #101828;
+  --color-chat-text: #4a5565;
+  --color-chat-subtext: #6a7282;
+  --color-chat-border: #e5e7eb;
+  --color-chat-input-border: #d1d5dc;
+  --color-chat-surface: #f9fafb;
+  --color-chat-body: #f3f4f6;
+  --color-chat-online: #00c950;
+  --color-chat-avatar: #d1d5dc;
   
   --font-primary: 'Inter', sans-serif;
   --font-heading: 'Playfair Display', serif;
