@@ -486,6 +486,18 @@ const ProfilePage: React.FC = () => {
                     error={errors.newPassword}
                   />
 
+                  <FormInput
+                    id="confirmPassword"
+                    label="Xác nhận mật khẩu"
+                    type="password"
+                    value={pwdForm.confirmPassword}
+                    onChange={(e) =>
+                      setPwdForm({ ...pwdForm, confirmPassword: e.target.value })
+                    }
+                    placeholder="••••••••"
+                    error={errors.confirmPassword}
+                  />
+
                   <FormButton
                     type="submit"
                     isLoading={isUpdatingPwd}

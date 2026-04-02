@@ -3,6 +3,7 @@ import { Modal } from '../../components/ui/Modal';
 import { RegisterModal } from '../../components/auth/RegisterModal';
 import { LoginModal } from '../../components/auth/LoginModal';
 import { VerifyOtpModal } from '../../components/auth/VerifyOtpModal';
+import { ForgotPasswordModal } from '../../components/auth/ForgotPasswordModal';
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { StatusModal } from '../../components/ui/StatusModal';
@@ -14,6 +15,7 @@ export default function HomePage() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isVerifyOtpOpen, setIsVerifyOtpOpen] = useState(false);
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [pendingEmail, setPendingEmail] = useState('');
 
   const handleSwitchToLogin = () => {
@@ -24,6 +26,16 @@ export default function HomePage() {
   const handleSwitchToRegister = () => {
     setIsLoginOpen(false);
     setIsRegisterOpen(true);
+  };
+
+  const handleSwitchToForgotPassword = () => {
+    setIsLoginOpen(false);
+    setIsForgotPasswordOpen(true);
+  };
+
+  const handleBackToLoginFromForgot = () => {
+    setIsForgotPasswordOpen(false);
+    setIsLoginOpen(true);
   };
 
   const handleRegisterSuccess = (email: string) => {
@@ -89,7 +101,19 @@ export default function HomePage() {
       <Modal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)}>
         <LoginModal
           onSwitchToRegister={handleSwitchToRegister}
+          onSwitchToForgotPassword={handleSwitchToForgotPassword}
           onSuccess={handleLoginSuccess}
+        />
+      </Modal>
+
+      {/* Forgot Password Modal */}
+      <Modal isOpen={isForgotPasswordOpen} onClose={() => setIsForgotPasswordOpen(false)}>
+        <ForgotPasswordModal
+          onBackToLogin={handleBackToLoginFromForgot}
+          onSuccess={() => {
+            setIsForgotPasswordOpen(false);
+            setIsLoginOpen(true);
+          }}
         />
       </Modal>
 

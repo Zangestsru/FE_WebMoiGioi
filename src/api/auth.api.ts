@@ -30,4 +30,20 @@ export const authApi = {
     const response = await axiosClient.post<LoginResponseDTO>('/auth/facebook', data);
     return response.data;
   },
+
+  /**
+   * Forgot Password - Request OTP via Email
+   */
+  forgotPassword: async (email: string): Promise<{ success: boolean; message: string }> => {
+    const response = await axiosClient.post<{ success: boolean; message: string }>('/auth/forgot-password', { email });
+    return response.data;
+  },
+
+  /**
+   * Reset Password - Set new password with OTP
+   */
+  resetPassword: async (data: any): Promise<{ success: boolean; message: string }> => {
+    const response = await axiosClient.post<{ success: boolean; message: string }>('/auth/reset-password', data);
+    return response.data;
+  },
 };

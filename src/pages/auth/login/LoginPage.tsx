@@ -2,6 +2,9 @@ import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { useLoginForm } from '../../../hooks/useLoginForm';
 import { FormInput } from '../../../components/ui/FormInput';
 import { FormButton } from '../../../components/ui/FormButton';
+import { Modal } from '../../../components/ui/Modal';
+import { ForgotPasswordModal } from '../../../components/auth/ForgotPasswordModal';
+import { useState } from 'react';
 
 /**
  * LoginPage - UI Layer only using Tailwind.
@@ -17,6 +20,8 @@ export default function LoginPage() {
     handleGoogleSuccess,
     handleFacebookLogin,
   } = useLoginForm();
+
+  const [isForgotOpen, setIsForgotOpen] = useState(false);
 
   return (
     <main className="flex min-h-screen overflow-hidden flex-col md:flex-row">
@@ -103,9 +108,13 @@ export default function LoginPage() {
           </form>
 
           <div className="flex flex-col gap-2 mt-2">
-            <a href="/forgot-password" className="font-primary text-sm text-blue-500 font-semibold no-underline hover:underline text-center">
+            <button 
+              type="button" 
+              onClick={() => setIsForgotOpen(true)} 
+              className="font-primary text-sm text-blue-500 font-semibold no-underline hover:underline text-center bg-transparent border-none p-0 cursor-pointer"
+            >
               Quên mật khẩu?
-            </a>
+            </button>
 
             {/* Divider */}
             <div className="relative flex items-center gap-4 my-4">
@@ -163,6 +172,14 @@ export default function LoginPage() {
           </div>
         </div>
       </section>
+
+      {/* Forgot Password Modal */}
+      <Modal isOpen={isForgotOpen} onClose={() => setIsForgotOpen(false)}>
+        <ForgotPasswordModal
+          onBackToLogin={() => setIsForgotOpen(false)}
+          onSuccess={() => setIsForgotOpen(false)}
+        />
+      </Modal>
     </main>
   );
 }
