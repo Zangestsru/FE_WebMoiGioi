@@ -22,7 +22,9 @@ export function AgentPostPage() {
     provinceCode: '',
     provinceName: '',
     wardCode: '',
-    wardName: ''
+    wardName: '',
+    beds: '',
+    rooms: ''
   });
   
   // Property Types State
@@ -55,7 +57,9 @@ export function AgentPostPage() {
             provinceCode: data.provinceCode || '',
             provinceName: data.provinceName || '',
             wardCode: data.wardCode || '',
-            wardName: data.wardName || ''
+            wardName: data.wardName || '',
+            beds: data.attributes?.beds ? data.attributes.beds.toString() : '',
+            rooms: data.attributes?.rooms ? data.attributes.rooms.toString() : ''
           });
           
           // Pre-fetch wards if edit mode
@@ -343,6 +347,34 @@ export function AgentPostPage() {
                 onChange={handleInputChange}
                 className="w-full bg-[#F3F4F6] border-none rounded-2xl p-4 font-bold text-[15px] focus:ring-2 focus:ring-[#cfb53b] outline-none transition-all placeholder-gray-400 text-gray-900" 
                 placeholder="VD: 150" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-6 w-full col-span-1 md:col-span-2">
+              <div>
+                <label className="block text-[14px] font-black text-gray-900 mb-2 uppercase tracking-wide">
+                  Số phòng ngủ (Beds)
+                </label>
+                <input 
+                  type="number" 
+                  name="beds"
+                  value={formData.beds}
+                  onChange={handleInputChange}
+                  className="w-full bg-[#F3F4F6] border-none rounded-2xl p-4 font-bold text-[15px] focus:ring-2 focus:ring-[#cfb53b] outline-none transition-all placeholder-gray-400 text-gray-900" 
+                  placeholder="VD: 3" />
+              </div>
+
+              <div>
+                <label className="block text-[14px] font-black text-gray-900 mb-2 uppercase tracking-wide">
+                  Số phòng tắm/khác (Rooms)
+                </label>
+                <input 
+                  type="number" 
+                  name="rooms"
+                  value={formData.rooms}
+                  onChange={handleInputChange}
+                  className="w-full bg-[#F3F4F6] border-none rounded-2xl p-4 font-bold text-[15px] focus:ring-2 focus:ring-[#cfb53b] outline-none transition-all placeholder-gray-400 text-gray-900" 
+                  placeholder="VD: 2" />
+              </div>
             </div>
 
             {/* Location Selects */}
