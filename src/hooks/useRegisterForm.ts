@@ -33,9 +33,9 @@ export function useRegisterForm() {
     // Real-time validation for passwords while typing
     if (field === 'password' || field === 'confirmPassword') {
       const validationErrs = AuthValidator.validateRegisterForm(newState);
-      setErrors((prev) => ({ 
-        ...prev, 
-        [field]: validationErrs[field as keyof FormErrors] 
+      setErrors((prev) => ({
+        ...prev,
+        [field]: validationErrs[field as keyof FormErrors]
       }));
     } else {
       // Clear error on change for other fields
@@ -59,16 +59,9 @@ export function useRegisterForm() {
       }
 
       if (result.response?.success) {
-        showStatus('Đăng ký thành công', 'Chào mừng bạn! Vui lòng xác thực tài khoản để tiếp tục.', 'success');
-        
         // Store email for OTP verification step
         localStorage.setItem('pending_auth_email', formState.email);
 
-        // Redirect to OTP page after a short delay
-        setTimeout(() => {
-          navigate('/verify-otp');
-        }, 1500);
-        
         return true;
       }
       return false;

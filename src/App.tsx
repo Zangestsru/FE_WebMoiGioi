@@ -9,6 +9,9 @@ import HomePage from "./pages/home/HomePage";
 import ProfilePage from "./pages/profile/ProfilePage";
 import BrokerRegistrationPage from "./pages/user/BrokerRegistrationPage";
 import ChatPage from "./pages/chat/ChatPage";
+import LoginPage from "./pages/auth/login/LoginPage";
+import RegisterPage from "./pages/auth/register/RegisterPage";
+import VerifyOtpPage from "./pages/auth/verify-otp/VerifyOtpPage";
 
 import { useAuthStore } from "./store/useAuthStore";
 import { useSocketStore } from "./store/useSocketStore";
@@ -51,6 +54,9 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/verify-otp" element={<VerifyOtpPage />} />
 
         {/* Protected Routes - Redirect to Home if not authenticated */}
         <Route

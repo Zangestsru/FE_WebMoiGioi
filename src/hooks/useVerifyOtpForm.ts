@@ -40,19 +40,21 @@ export function useVerifyOtpForm(initialEmail: string = '') {
       
       if (result.errors) {
         setErrors(result.errors);
+        return false;
       } else if (result.response?.success) {
-        showStatus('Xác thực thành công', 'Chào mừng bạn! Đang chuyển hướng đăng nhập...', 'success');
+        showStatus('Đăng ký thành công', 'Chào mừng bạn đến với hệ thống! Đang chuyển hướng...', 'success');
         
         // Update Auth Store
         setUser(result.response.data);
         
-        // Redirect after a brief delay
-        setTimeout(() => navigate('/'), 1000);
+        return true;
       }
+      return false;
     } catch (error) {
       const err = error as any;
       const msg = err.message || 'Xác thực không thành công. Vui lòng thử lại sau.';
       showStatus('Lỗi xác thực', msg, 'error');
+      return false;
     } finally {
       setIsLoading(false);
     }

@@ -13,7 +13,6 @@ export default function VerifyOtpPage() {
     errors,
     isLoading,
     isResending,
-    successMessage,
     handleChange,
     handleSubmit,
     handleResend,
@@ -40,34 +39,25 @@ export default function VerifyOtpPage() {
 
       {/* RIGHT: Form Panel */}
       <section className="w-full md:w-[460px] shrink-0 bg-white flex items-center justify-center py-12 px-8 overflow-y-auto" aria-label="Biểu mẫu xác thực OTP">
-        <div className="w-full max-w-[360px] flex flex-col gap-8">
-          <div className="flex flex-col gap-2">
-            <h2 className="font-heading text-3xl font-bold text-gray-900 m-0 tracking-[-0.01em]">Xác nhận mã OTP</h2>
+        <div className="w-full max-w-[360px] flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <h2 className="font-heading text-3xl font-bold text-gray-900 m-0 mb-1 tracking-[-0.01em]">Xác nhận mã OTP</h2>
             <p className="font-primary text-sm text-gray-500 leading-relaxed">
               Chúng tôi đã gửi mã xác thực gồm 6 chữ số đến email <span className="font-bold text-gray-900 border-b border-gray-300">{formState.email || 'của bạn'}</span>.
             </p>
           </div>
 
-          {/* Success Banner */}
-          {successMessage && (
-            <div className="px-4 py-3 rounded-lg font-primary text-sm font-medium bg-[#d1fae5] text-[#065f46] border border-[#6ee7b7] flex items-center gap-2" role="status">
-              <span className="text-lg">✓</span>
-              {successMessage}
-            </div>
-          )}
-
           {/* General Error Banner */}
           {errors.general && (
-            <div className="px-4 py-3 rounded-lg font-primary text-sm font-medium bg-[#fee2e2] text-[#991b1b] border border-[#fca5a5] flex items-center gap-2" role="alert">
-              <span className="text-lg">⚠</span>
+            <div className="px-4 py-2 rounded-lg font-primary text-sm font-medium bg-[#fee2e2] text-[#991b1b] border border-[#fca5a5]" role="alert">
               {errors.general}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6">
-            <div className="flex flex-col gap-3">
+          <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3 mt-2">
+            <div className="flex flex-col gap-1.5">
               <label className="font-primary text-[14px] font-bold text-gray-700 tracking-[0.01em]" htmlFor="otp-input">
-                Nhập mã xác thực
+                Mã xác thực
               </label>
               <input
                 id="otp-input"
@@ -76,7 +66,7 @@ export default function VerifyOtpPage() {
                 pattern="[0-9]*"
                 maxLength={6}
                 placeholder="0 0 0 0 0 0"
-                className={`w-full tracking-[1.2em] text-center text-3xl font-bold px-3 py-5 bg-gray-50 border-[1.5px] rounded-xl font-primary text-gray-900 outline-none transition-all duration-200 box-border placeholder:tracking-normal placeholder:font-normal placeholder:text-lg placeholder-gray-400
+                className={`w-full tracking-[1em] text-center text-3xl font-bold px-3 py-4 bg-gray-50 border-[1.5px] rounded-xl font-primary text-gray-900 outline-none transition-all duration-200 box-border placeholder:tracking-normal placeholder:font-normal placeholder:text-lg placeholder-gray-400
                   ${errors.general ? 'border-red-500 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.1)]' : 'border-gray-200 focus:border-blue-500 focus:bg-white focus:shadow-[0_0_0_4px_rgba(59,130,246,0.1)]'}`}
                 value={formState.otp}
                 onChange={(e) => handleChange(e.target.value)}
@@ -97,7 +87,7 @@ export default function VerifyOtpPage() {
             </div>
           </form>
 
-          <div className="flex flex-col items-center gap-5 pt-4 border-t border-gray-100">
+          <div className="flex flex-col items-center gap-3 pt-4 border-t border-gray-100">
             <p className="font-primary text-sm text-gray-500 m-0">
               Bạn chưa nhận được mã?
             </p>
@@ -105,12 +95,12 @@ export default function VerifyOtpPage() {
               type="button"
               onClick={handleResend}
               disabled={isResending || isLoading}
-              className="px-8 py-2.5 rounded-full border-[1.5px] border-blue-500 text-blue-600 font-bold text-sm hover:bg-blue-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95"
+              className="w-full py-2.5 rounded-xl border border-blue-500 text-blue-600 font-bold text-sm hover:bg-blue-50 transition-all duration-200 disabled:opacity-50"
             >
               {isResending ? 'Đang gửi lại...' : 'Gửi lại mã mới'}
             </button>
             
-            <a href="/login" className="text-gray-400 font-semibold text-sm no-underline hover:text-blue-500 hover:underline transition-colors mt-2">
+            <a href="/login" className="text-gray-400 font-semibold text-sm no-underline hover:text-blue-500 transition-colors mt-1">
               Quay lại Đăng nhập
             </a>
           </div>
