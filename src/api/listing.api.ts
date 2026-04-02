@@ -1,8 +1,21 @@
 import axiosClient from './axiosClient';
+import axios from 'axios';
 import type { Listing } from '../types/listing.types';
 import type { ApiResponse } from '../types/user.types';
 
+// Public axios instance (no auth interceptor)
+const publicAxios = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  headers: { 'Content-Type': 'application/json' },
+});
+
 export const listingApi = {
+  // Public API - no auth required
+  getPublicListings: async (): Promise<ApiResponse<Listing[]>> => {
+    const response = await publicAxios.get<ApiResponse<Listing[]>>('/listings/public');
+    return response.data;
+  },
+
   createListing: async (formData: FormData): Promise<ApiResponse<Listing>> => {
     const response = await axiosClient.post<ApiResponse<Listing>>('/listings', formData, {
       headers: {
