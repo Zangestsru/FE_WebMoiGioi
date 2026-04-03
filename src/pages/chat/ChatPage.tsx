@@ -288,19 +288,28 @@ export default function ChatPage() {
                     >
                       <div className="flex items-start gap-3">
                         <div className="flex size-12 items-center justify-center rounded-full bg-chat-gold text-white shrink-0">
-                          {renderParticipantAvatar(getOtherParticipant(conversation), 20)}
+                          {renderParticipantAvatar(
+                            getOtherParticipant(conversation),
+                            20,
+                          )}
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium text-chat-heading">
                             {name}
                           </p>
                           <p className="truncate text-xs text-chat-text">
-                            {conversation.lastMessage ??
+                            {messages[messages.length - 1]?.message ??
+                              conversation.lastMessage ??
                               "Bắt đầu trò chuyện..."}
                           </p>
                         </div>
                         <span className="text-[11px] text-chat-subtext shrink-0">
-                          {formatLastTime(conversation.lastMessageAt)}
+                          {formatLastTime(
+                            messages[
+                              messages.length - 1
+                            ]?.timestamp.toISOString() ??
+                              conversation.lastMessageAt,
+                          )}
                         </span>
                       </div>
                     </button>
@@ -318,7 +327,10 @@ export default function ChatPage() {
               <header className="flex items-center justify-between border-b border-chat-gold/60 bg-white px-8 py-4">
                 <div className="flex items-center gap-3">
                   <div className="flex size-10 items-center justify-center rounded-full bg-chat-gold text-white">
-                    {renderParticipantAvatar(getOtherParticipant(activeConversation), 18)}
+                    {renderParticipantAvatar(
+                      getOtherParticipant(activeConversation),
+                      18,
+                    )}
                   </div>
                   <div>
                     <h2 className="text-lg font-medium text-chat-heading">
@@ -352,7 +364,10 @@ export default function ChatPage() {
                       >
                         {!isMyMessage && (
                           <div className="flex size-8 items-center justify-center rounded-full bg-chat-gold text-white shrink-0">
-                            {renderParticipantAvatar(getOtherParticipant(activeConversation), 16)}
+                            {renderParticipantAvatar(
+                              getOtherParticipant(activeConversation),
+                              16,
+                            )}
                           </div>
                         )}
                         <div
