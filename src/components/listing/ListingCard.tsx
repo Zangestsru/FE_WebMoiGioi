@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { Heart, MapPin } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import type { Listing } from '../../types/listing.types';
+import { useFavoriteStore } from '../../store/useFavoriteStore';
+import { useAuthStore } from '../../store/useAuthStore';
+import { listingApi } from '../../api/listing.api';
 
 interface ListingCardProps {
   listing: Listing;
@@ -43,8 +47,39 @@ function getPrimaryImage(listing: Listing): string {
 
 
 export function ListingCard({ listing }: Readonly<ListingCardProps>) {
-  const [isLiked, setIsLiked] = useState(false);
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
+  const { favoriteIds, addFavoriteId, removeFavoriteId } = useFavoriteStore();
+  
+  const isLiked = favoriteIds.includes(listing.id.toString());
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
+
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      alert('Vui lòng đăng nhập để lưu bất động sản');
+      return;
+    }
+
+    if (isToggling) return;
+
+    try {
+      setIsToggling(true);
+      const res = await listingApi.toggleFavorite(listing.id.toString());
+      if (res.success) {
+        if (res.data.action === 'added') {
+          addFavoriteId(listing.id.toString());
+        } else {
+          removeFavoriteId(listing.id.toString());
+        }
+      }
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
+    } finally {
+      setIsToggling(false);
+    }
+  };
 
   const imageUrl = getPrimaryImage(listing);
   const propertyTypeName = listing.propertyType?.name || 'Bất động sản';
@@ -63,6 +98,7 @@ export function ListingCard({ listing }: Readonly<ListingCardProps>) {
   return (
     <article
       id={`listing-card-${listing.id}`}
+      onClick={() => navigate(`/du-an/${listing.id}`)}
       className="group relative bg-white rounded-2xl overflow-hidden shadow-[0_2px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.15)] transition-all duration-500 ease-out cursor-pointer border border-gray-100/60 hover:border-gray-200/80"
     >
       {/* IMAGE CONTAINER */}
@@ -87,21 +123,19 @@ export function ListingCard({ listing }: Readonly<ListingCardProps>) {
 
         {/* Like button */}
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsLiked(!isLiked);
-          }}
+          onClick={handleToggleFavorite}
+          disabled={isToggling}
           className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 z-10 ${
             isLiked
               ? 'bg-red-500 text-white shadow-lg shadow-red-500/30'
-              : 'bg-white text-black hover:text-red-500 shadow-md'
-          }`}
+              : 'bg-white/90 backdrop-blur-sm text-black hover:text-red-500 shadow-md'
+          } ${isToggling ? 'opacity-70 scale-95' : 'hover:scale-110'}`}
           aria-label={isLiked ? 'Bỏ yêu thích' : 'Thêm yêu thích'}
         >
           <Heart
             size={18}
             className={`transition-transform duration-300 ${isLiked ? 'scale-110' : ''}`}
-            fill={isLiked ? 'currentColor' : 'currentColor'}
+            fill={isLiked ? 'currentColor' : 'none'}
           />
         </button>
 
