@@ -13,9 +13,12 @@ import ChatPage from "./pages/chat/ChatPage";
 import LoginPage from "./pages/auth/login/LoginPage";
 import RegisterPage from "./pages/auth/register/RegisterPage";
 import VerifyOtpPage from "./pages/auth/verify-otp/VerifyOtpPage";
+import ProjectDetailPage from "./pages/project/ProjectDetailPage";
+import FavoritesPage from "./pages/user/FavoritesPage";
 
 import { useAuthStore } from "./store/useAuthStore";
 import { useSocketStore } from "./store/useSocketStore";
+import { useFavoriteStore } from "./store/useFavoriteStore";
 
 import { ToastContainer } from "./components/ui/Toast";
 
@@ -39,6 +42,14 @@ import { AgentPostPage } from "./pages/agent/AgentPostPage";
 function App() {
   const { isAuthenticated } = useAuthStore();
   const { connect, disconnect } = useSocketStore();
+  const { syncFavorites } = useFavoriteStore();
+
+  // Sync favorites when user logs in
+  useEffect(() => {
+    if (isAuthenticated) {
+      syncFavorites();
+    }
+  }, [isAuthenticated, syncFavorites]);
 
   // Quản lý kết nối socket dựa trên trạng thái đăng nhập
   useEffect(() => {
@@ -56,6 +67,8 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/du-an" element={<ProjectListingPage />} />
+        <Route path="/du-an/:id" element={<ProjectDetailPage />} />
+        <Route path="/yeu-thich" element={isAuthenticated ? <FavoritesPage /> : <Navigate to="/" />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/verify-otp" element={<VerifyOtpPage />} />
