@@ -6,6 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import HomePage from "./pages/home/HomePage";
+import ProjectListingPage from "./pages/project/ProjectListingPage";
 import ProfilePage from "./pages/profile/ProfilePage";
 import BrokerRegistrationPage from "./pages/user/BrokerRegistrationPage";
 import ChatPage from "./pages/chat/ChatPage";
@@ -54,6 +55,7 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
+        <Route path="/du-an" element={<ProjectListingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/verify-otp" element={<VerifyOtpPage />} />

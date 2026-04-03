@@ -37,7 +37,6 @@ export function Navbar({ onLoginClick, onRegisterClick }: Readonly<NavbarProps>)
           {[
             { label: 'Mua', href: '#mua' },
             { label: 'Bán', href: '#ban' },
-            { label: 'Dự án', href: '#du-an' },
             { label: 'Tin tức', href: '#tin-tuc' }
           ].map((item) => (
             <a
@@ -48,6 +47,12 @@ export function Navbar({ onLoginClick, onRegisterClick }: Readonly<NavbarProps>)
               {item.label}
             </a>
           ))}
+          <Link
+            to="/du-an"
+            className="font-primary text-[15px] font-semibold text-gray-700 hover:text-black transition-colors"
+          >
+            Dự án
+          </Link>
         </div>
 
         {/* SEARCH BAR - Desktop */}
@@ -166,7 +171,6 @@ export function Navbar({ onLoginClick, onRegisterClick }: Readonly<NavbarProps>)
             {[
               { label: 'Mua', href: '#mua' },
               { label: 'Bán', href: '#ban' },
-              { label: 'Dự án', href: '#du-an' },
               { label: 'Tin tức', href: '#tin-tuc' }
             ].map((item) => (
               <a
@@ -178,6 +182,13 @@ export function Navbar({ onLoginClick, onRegisterClick }: Readonly<NavbarProps>)
                 {item.label}
               </a>
             ))}
+            <Link
+              to="/du-an"
+              className="font-primary text-lg font-bold text-gray-900 border-b border-gray-50 pb-4"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Dự án
+            </Link>
             {isAuthenticated ? (
               <>
                 <Link
