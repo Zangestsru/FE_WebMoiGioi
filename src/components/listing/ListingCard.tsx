@@ -66,7 +66,7 @@ export function ListingCard({ listing }: Readonly<ListingCardProps>) {
       className="group relative bg-white rounded-2xl overflow-hidden shadow-[0_2px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.15)] transition-all duration-500 ease-out cursor-pointer border border-gray-100/60 hover:border-gray-200/80"
     >
       {/* IMAGE CONTAINER */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 rounded-b-2xl">
+      <div className="relative aspect-[16/10] overflow-hidden bg-gray-100 rounded-b-xl">
         {/* Skeleton loader */}
         {!imageLoaded && (
           <div className="absolute inset-0 bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 animate-pulse" />
@@ -130,31 +130,31 @@ export function ListingCard({ listing }: Readonly<ListingCardProps>) {
       </div>
 
       {/* CONTENT */}
-      <div className="p-5 sm:p-6 pb-7">
+      <div className="p-4 sm:p-5 pb-5">
         {/* Price */}
-        <div className="mb-2">
-          <span className="text-[22px] sm:text-[26px] font-extrabold text-[#c4a946] tracking-tight leading-none">
+        <div className="mb-1.5">
+          <span className="text-[18px] sm:text-[20px] font-extrabold text-[#c4a946] tracking-tight leading-none">
             {formatPrice(listing.price, listing.priceUnit)}
           </span>
         </div>
 
         {/* Title */}
-        <h3 className="text-[24px] sm:text-[28px] font-black text-black leading-tight mb-3 line-clamp-2 group-hover:text-[#c4a946] transition-colors duration-300">
+        <h3 className="text-[18px] sm:text-[20px] font-black text-black leading-tight mb-2 line-clamp-2 group-hover:text-[#c4a946] transition-colors duration-300">
           {listing.title}
         </h3>
 
         {/* Property Type */}
-        <div className="mb-4">
-          <span className="inline-flex px-3 py-1 rounded-md bg-gray-100 text-[11px] font-bold text-gray-600 uppercase tracking-wide">
+        <div className="mb-3">
+          <span className="inline-flex px-2 py-0.5 rounded-md bg-gray-100 text-[10px] font-bold text-gray-600 uppercase tracking-wide">
             {propertyTypeName}
           </span>
         </div>
 
         {/* Address */}
         {fullAddress && (
-          <div className="flex items-start gap-2 mb-7">
-            <MapPin size={20} className="text-[#c4a946] mt-0.5 shrink-0" />
-            <span className="text-[15px] sm:text-[16px] text-gray-900 leading-snug line-clamp-3">
+          <div className="flex items-start gap-2 mb-4">
+            <MapPin size={16} className="text-[#c4a946] mt-0.5 shrink-0" />
+            <span className="text-[13px] sm:text-[14px] text-gray-900 leading-snug line-clamp-2">
               {fullAddress}
             </span>
           </div>
@@ -165,24 +165,24 @@ export function ListingCard({ listing }: Readonly<ListingCardProps>) {
           <div className="flex flex-row items-center justify-between px-2 text-center">
             {/* Beds */}
             <div className="flex flex-col items-center">
-              <span className="text-[12px] sm:text-[13px] text-gray-800 font-medium tracking-wide mb-3">BEDS</span>
-              <span className="text-[16px] sm:text-[18px] font-extrabold text-black">
+              <span className="text-[11px] text-gray-800 font-medium tracking-wide mb-2">BEDS</span>
+              <span className="text-[14px] sm:text-[15px] font-extrabold text-black">
                 {listing.attributes?.beds || '-'}
               </span>
             </div>
             
             {/* Rooms / Baths */}
             <div className="flex flex-col items-center">
-              <span className="text-[12px] sm:text-[13px] text-gray-800 font-medium tracking-wide mb-3">ROOMS</span>
-              <span className="text-[16px] sm:text-[18px] font-extrabold text-black">
+              <span className="text-[11px] text-gray-800 font-medium tracking-wide mb-2">ROOMS</span>
+              <span className="text-[14px] sm:text-[15px] font-extrabold text-black">
                 {listing.attributes?.rooms || '-'}
               </span>
             </div>
 
             {/* Area */}
             <div className="flex flex-col items-center">
-              <span className="text-[12px] sm:text-[13px] text-gray-800 font-medium tracking-wide mb-3">SOFT</span>
-              <span className="text-[16px] sm:text-[18px] font-extrabold text-black">
+              <span className="text-[11px] text-gray-800 font-medium tracking-wide mb-2">SOFT</span>
+              <span className="text-[14px] sm:text-[15px] font-extrabold text-black">
                 {listing.areaGross ? Number(listing.areaGross).toFixed(0) : '-'}
               </span>
             </div>
