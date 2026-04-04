@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, LogOut, User as UserIcon, ChevronDown, Menu, X, Briefcase, LayoutDashboard, MessageCircle } from 'lucide-react';
+import { Search, LogOut, User as UserIcon, ChevronDown, Menu, X, Briefcase, LayoutDashboard, MessageCircle, Heart } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
+import { useFavoriteStore } from '../../store/useFavoriteStore';
 
 interface NavbarProps {
   onLoginClick: () => void;
@@ -10,6 +11,7 @@ interface NavbarProps {
 
 export function Navbar({ onLoginClick, onRegisterClick }: Readonly<NavbarProps>) {
   const { user, isAuthenticated, logout } = useAuthStore();
+  const { favoriteIds } = useFavoriteStore();
   const navigate = useNavigate();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -105,6 +107,14 @@ export function Navbar({ onLoginClick, onRegisterClick }: Readonly<NavbarProps>)
                   >
                     <MessageCircle size={18} />
                     Tin nhắn
+                  </Link>
+                  <Link
+                    to="/yeu-thich"
+                    onClick={() => setIsUserMenuOpen(false)}
+                    className="w-full flex items-center gap-3.5 px-5 py-3 hover:bg-gray-50 transition-colors font-primary text-sm font-bold text-gray-700"
+                  >
+                    <Heart size={18} />
+                    BĐS Yêu thích
                   </Link>
                   {user?.accountType === 'MEMBER' && (
                     <Link
