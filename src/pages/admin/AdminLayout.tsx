@@ -134,7 +134,7 @@ export function AdminLayout() {
 
             <NavItem href="#banner" icon={ImageIcon} label="Banner & Quảng cáo" isActive={false} />
 
-            <NavItem href="#users" icon={Users} label="Quản lý Người dùng" isActive={false} />
+            <NavItem href="/admin/users" icon={Users} label="Quản lý Người dùng" isActive={location.pathname === "/admin/users"} />
 
             <div className="mt-6 mb-2">
               <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-3">Vận hành</div>

@@ -80,5 +80,21 @@ export const userApi = {
     const response = await axiosClient.get('/user/admin/user-count');
     return response.data;
   },
+
+  /**
+   * Admin: Get all users
+   */
+  getAllUsers: async (params?: any): Promise<ApiResponse<(User & { profile: UserProfile | null })[]>> => {
+    const response = await axiosClient.get('/user/admin/users', { params });
+    return response.data;
+  },
+
+  /**
+   * Admin: Update user status or role
+   */
+  updateUser: async (id: string | number, data: { status?: string; accountType?: string }): Promise<ApiResponse<User>> => {
+    const response = await axiosClient.patch(`/user/admin/users/${id}`, data);
+    return response.data;
+  },
 };
 

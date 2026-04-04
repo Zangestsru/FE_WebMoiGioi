@@ -33,6 +33,7 @@ import { ListingApprovals } from './pages/admin/ListingApprovals';
 import { ProjectApprovals } from './pages/admin/ProjectApprovals';
 import { ReportApprovals } from './pages/admin/ReportApprovals';
 import { CategoryManagement } from './pages/admin/CategoryManagement';
+import { UserManagement } from './pages/admin/UserManagement';
 
 // Agent imports
 import { AgentRoute } from "./components/auth/AgentRoute";
@@ -112,6 +113,7 @@ function App() {
           <Route path="report-approvals" element={<ReportApprovals />} />
           <Route path="project-approvals" element={<ProjectApprovals />} />
           <Route path="categories" element={<CategoryManagement />} />
+          <Route path="users" element={<UserManagement />} />
         </Route>
 
         {/* Agent Routes - Only accessible by AGENT role */}
