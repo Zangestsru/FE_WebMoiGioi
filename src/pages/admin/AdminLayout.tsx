@@ -19,7 +19,8 @@ import {
   ShieldCheck,
   List,
   Award,
-  LogOut
+  LogOut,
+  Flag
 } from "lucide-react";
 import { ImageWithFallback } from "../../components/ui/ImageWithFallback";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -124,6 +125,8 @@ export function AdminLayout() {
 
             <NavItem href="/admin/listing-approvals" icon={CheckSquare} label="Duyệt Tin đăng" isActive={location.pathname === "/admin/listing-approvals"} />
 
+
+            <NavItem href="/admin/report-approvals" icon={Flag} label="Báo cáo vi phạm" isActive={location.pathname === "/admin/report-approvals"} />
             <NavItem href="#category" icon={Tags} label="Quản lý Danh mục" isActive={false} />
 
             <NavItem href="#cms" icon={FileText} label="CMS (Tin tức)" isActive={false} />
