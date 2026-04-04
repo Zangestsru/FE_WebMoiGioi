@@ -4,11 +4,11 @@ import { Search, LogOut, User as UserIcon, ChevronDown, Menu, X } from 'lucide-r
 import { useAuthStore } from '../../store/useAuthStore';
 
 interface NavbarProps {
-  onLoginClick?: () => void;
-  onRegisterClick?: () => void;
+  onLoginClick: () => void;
+  onRegisterClick: () => void;
 }
 
-export function Navbar({ onLoginClick = () => {}, onRegisterClick = () => {} }: NavbarProps) {
+export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
   const { user, isAuthenticated, logout } = useAuthStore();
   const navigate = useNavigate();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);

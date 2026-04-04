@@ -14,7 +14,7 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <Navbar />
+      <Navbar onLoginClick={() => {}} onRegisterClick={() => {}} />
       
       {/* Add margin top for fixed navbar behavior if needed, or handle in CSS */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-[80px]">
