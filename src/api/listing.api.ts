@@ -73,4 +73,19 @@ export const listingApi = {
     const response = await axiosClient.get<ApiResponse<Listing[]>>('listings/favorites');
     return response.data;
   },
+
+  // Admin APIs
+  getAdminDashboardStats: async (): Promise<ApiResponse<{
+    totalListings: number;
+    pendingListings: number;
+    postsByMonth: { name: string; total: number }[];
+  }>> => {
+    const response = await axiosClient.get('listings/admin/dashboard-stats');
+    return response.data;
+  },
+
+  getAdminPendingListings: async (): Promise<ApiResponse<any[]>> => {
+    const response = await axiosClient.get('listings/admin/pending');
+    return response.data;
+  },
 };
