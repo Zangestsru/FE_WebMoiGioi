@@ -57,6 +57,16 @@ export const getMyConversations = async (): Promise<Conversation[]> => {
 };
 
 /**
+ * Get a specific conversation by ID
+ */
+export const getConversationById = async (conversationId: string): Promise<Conversation> => {
+  const response = await axiosClient.get<{ data: Conversation }>(
+    `/chat/conversations/${conversationId}`
+  );
+  return response.data.data;
+};
+
+/**
  * Upload a file into a conversation room
  */
 export const sendChatFile = async (
