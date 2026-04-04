@@ -128,7 +128,7 @@ export function AdminLayout() {
             <NavItem href="/admin/project-approvals" icon={Briefcase} label="Quản lý Dự án" isActive={location.pathname === "/admin/project-approvals"} />
 
             <NavItem href="/admin/report-approvals" icon={Flag} label="Báo cáo vi phạm" isActive={location.pathname === "/admin/report-approvals"} />
-            <NavItem href="#category" icon={Tags} label="Quản lý Danh mục" isActive={false} />
+            <NavItem href="/admin/categories" icon={Tags} label="Quản lý Danh mục" isActive={location.pathname === "/admin/categories"} />
 
             <NavItem href="#cms" icon={FileText} label="CMS (Tin tức)" isActive={false} />
 
