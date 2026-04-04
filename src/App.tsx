@@ -28,6 +28,7 @@ import { AdminLayout } from "./pages/admin/AdminLayout";
 import { Dashboard } from "./pages/admin/Dashboard";
 import { BrokerApprovals } from "./pages/admin/BrokerApprovals";
 import { ListingApprovals } from "./pages/admin/ListingApprovals";
+import { ReportApprovals } from "./pages/admin/ReportApprovals";
 
 // Agent imports
 import { AgentRoute } from "./components/auth/AgentRoute";
@@ -100,6 +101,7 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="broker-approvals" element={<BrokerApprovals />} />
           <Route path="listing-approvals" element={<ListingApprovals />} />
+          <Route path="report-approvals" element={<ReportApprovals />} />
         </Route>
 
         {/* Agent Routes - Only accessible by AGENT role */}
