@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/home/HomePage';
 import ProfilePage from './pages/profile/ProfilePage';
+import PropertyManagementPage from './pages/admin/PropertyManagementPage';
 
 import { useAuthStore } from './store/useAuthStore';
 
@@ -24,6 +25,11 @@ function App() {
         <Route 
           path="/profile" 
           element={isAuthenticated ? <ProfilePage /> : <Navigate to="/" />} 
+        />
+
+        <Route 
+          path="/admin/properties" 
+          element={isAuthenticated ? <PropertyManagementPage /> : <Navigate to="/" />} 
         />
 
         {/* Catch-all - Redirect to home */}
