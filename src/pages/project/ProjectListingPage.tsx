@@ -1,6 +1,5 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { listingApi } from '../../api/listing.api';
-import { ListingCard } from '../../components/listing/ListingCard';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
 import { Modal } from '../../components/ui/Modal';
@@ -8,688 +7,190 @@ import { RegisterModal } from '../../components/auth/RegisterModal';
 import { LoginModal } from '../../components/auth/LoginModal';
 import { VerifyOtpModal } from '../../components/auth/VerifyOtpModal';
 import { StatusModal } from '../../components/ui/StatusModal';
-import type { Listing } from '../../types/listing.types';
-import {
-  ChevronLeft,
-  ChevronRight,
-  LayoutGrid,
-  List,
-  SlidersHorizontal,
-  X,
-  ChevronDown,
-  Home,
-} from 'lucide-react';
-
-/* ──────────────────────────────── Constants ──────────────────────────────── */
-
-const ITEMS_PER_PAGE = 6;
-
-const SORT_OPTIONS = [
-  { value: 'price-desc', label: 'Giá: Cao → Thấp' },
-  { value: 'price-asc', label: 'Giá: Thấp → Cao' },
-  { value: 'newest', label: 'Mới nhất' },
-  { value: 'area-desc', label: 'Diện tích: Lớn → Nhỏ' },
-] as const;
-
-type SortValue = (typeof SORT_OPTIONS)[number]['value'];
-
-const LISTING_TYPE_OPTIONS = [
-  { value: 'ALL', label: 'Tất cả' },
-  { value: 'SALE', label: 'Bán' },
-  { value: 'RENT', label: 'Cho thuê' },
-] as const;
-
-/* ──────────────────────────────── Helpers ──────────────────────────────── */
-
-function sortListings(listings: Listing[], sort: SortValue): Listing[] {
-  const sorted = [...listings];
-  switch (sort) {
-    case 'price-desc':
-      return sorted.sort((a, b) => b.price - a.price);
-    case 'price-asc':
-      return sorted.sort((a, b) => a.price - b.price);
-    case 'newest':
-      return sorted.sort(
-        (a, b) =>
-          new Date(b.publishedAt || 0).getTime() -
-          new Date(a.publishedAt || 0).getTime()
-      );
-    case 'area-desc':
-      return sorted.sort((a, b) => (b.areaGross || 0) - (a.areaGross || 0));
-    default:
-      return sorted;
-  }
-}
-
-/* ──────────────────────────────── Component ──────────────────────────────── */
+import { ChevronRight, Home, Image as ImageIcon, Search, MapPin } from 'lucide-react';
+import { projectApi, type ProjectSummary } from '../../api/project.api';
+import { useToastStore } from '../../store/useToastStore';
 
 export default function ProjectListingPage() {
-  /* ── Auth modal state (same pattern as HomePage) ── */
+  const navigate = useNavigate();
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isVerifyOtpOpen, setIsVerifyOtpOpen] = useState(false);
   const [pendingEmail, setPendingEmail] = useState('');
 
-  /* ── Data state ── */
-  const [listings, setListings] = useState<Listing[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [projects, setProjects] = useState<ProjectSummary[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  /* ── Filter / view state ── */
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState<SortValue>('newest');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [listingTypeFilter, setListingTypeFilter] = useState<string>('ALL');
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50_000_000_000]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-  const [isSortOpen, setIsSortOpen] = useState(false);
-  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
+  const fetchProjects = async () => {
+    try {
+      setIsLoading(true);
+      const res = await projectApi.getPublicProjects();
+      setProjects(res.data || []);
+    } catch (error) {
+      useToastStore.getState().addToast("Lỗi tải danh sách dự án", "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  /* ── Fetch listings ── */
   useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        setLoading(true);
-        const response = await listingApi.getPublicListings();
-        if (response.success && response.data) {
-          setListings(response.data);
-        }
-      } catch {
-        setError('Không thể tải danh sách bất động sản. Vui lòng thử lại.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchListings();
+    fetchProjects();
   }, []);
 
-  /* ── Derive unique property types from data ── */
-  const availablePropertyTypes = useMemo(() => {
-    const types = new Map<string, string>();
-    listings.forEach((l) => {
-      if (l.propertyType) {
-        types.set(String(l.propertyType.id), l.propertyType.name);
-      }
-    });
-    return Array.from(types, ([id, name]) => ({ id, name }));
-  }, [listings]);
-
-  /* ── Filtered + sorted listings ── */
-  const processedListings = useMemo(() => {
-    let result = [...listings];
-
-    // Listing type
-    if (listingTypeFilter !== 'ALL') {
-      result = result.filter((l) => l.listingType === listingTypeFilter);
-    }
-
-    // Price range
-    result = result.filter(
-      (l) => l.price >= priceRange[0] && l.price <= priceRange[1]
-    );
-
-    // Property type
-    if (selectedPropertyTypes.length > 0) {
-      result = result.filter(
-        (l) =>
-          l.propertyType &&
-          selectedPropertyTypes.includes(String(l.propertyType.id))
-      );
-    }
-
-    // Search
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(
-        (l) =>
-          l.title.toLowerCase().includes(q) ||
-          l.addressDisplay?.toLowerCase().includes(q) ||
-          l.provinceName?.toLowerCase().includes(q) ||
-          l.districtName?.toLowerCase().includes(q)
-      );
-    }
-
-    return sortListings(result, sortBy);
-  }, [listings, listingTypeFilter, priceRange, selectedPropertyTypes, searchQuery, sortBy]);
-
-  /* ── Pagination ── */
-  const totalPages = Math.max(1, Math.ceil(processedListings.length / ITEMS_PER_PAGE));
-  const paginatedListings = useMemo(
-    () =>
-      processedListings.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
-      ),
-    [processedListings, currentPage]
-  );
-
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [listingTypeFilter, priceRange, selectedPropertyTypes, searchQuery, sortBy]);
-
-  /* ── Auth modal handlers (identical to HomePage) ── */
   const handleSwitchToLogin = () => { setIsRegisterOpen(false); setIsLoginOpen(true); };
   const handleSwitchToRegister = () => { setIsLoginOpen(false); setIsRegisterOpen(true); };
   const handleRegisterSuccess = (email: string) => { setPendingEmail(email); setIsRegisterOpen(false); setIsVerifyOtpOpen(true); };
   const handleVerifySuccess = () => { setIsVerifyOtpOpen(false); window.location.reload(); };
   const handleLoginSuccess = () => { setIsLoginOpen(false); };
 
-  /* ── Toggle amenity ── */
-  const togglePropertyType = useCallback((id: string) => {
-    setSelectedPropertyTypes((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
-    );
-  }, []);
-
-  /* ── Reset filters ── */
-  const resetFilters = useCallback(() => {
-    setListingTypeFilter('ALL');
-    setPriceRange([0, 50_000_000_000]);
-    setSelectedPropertyTypes([]);
-    setSearchQuery('');
-  }, []);
-
-  /* ── Pagination UI helpers ── */
-  const getPageNumbers = () => {
-    const pages: (number | 'ellipsis')[] = [];
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-      pages.push(1);
-      if (currentPage > 3) pages.push('ellipsis');
-      const start = Math.max(2, currentPage - 1);
-      const end = Math.min(totalPages - 1, currentPage + 1);
-      for (let i = start; i <= end; i++) pages.push(i);
-      if (currentPage < totalPages - 2) pages.push('ellipsis');
-      pages.push(totalPages);
-    }
-    return pages;
+  const getStatusBadge = (status: string | undefined) => {
+    if (!status) return <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs font-medium">Đang cập nhật</span>;
+    if (status === 'Sắp mở bán') return <span className="px-2 py-1 bg-red-50 text-red-600 rounded text-xs font-medium">{status}</span>;
+    if (status === 'Đang mở bán') return <span className="px-2 py-1 bg-green-50 text-green-600 rounded text-xs font-medium">{status}</span>;
+    if (status === 'Đã bàn giao') return <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded text-xs font-medium">{status}</span>;
+    return <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs font-medium">{status}</span>;
   };
-
-  /* ── Format price for range display ── */
-  const formatRangePrice = (value: number) => {
-    if (value >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)} tỷ`;
-    if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(0)} tr`;
-    return new Intl.NumberFormat('vi-VN').format(value);
-  };
-
-  /* ──── Sidebar Filters Component ──── */
-  const FiltersSidebar = ({ isMobile = false }: { isMobile?: boolean }) => (
-    <aside
-      className={`${
-        isMobile
-          ? 'w-full'
-          : 'hidden lg:block w-[280px] shrink-0 sticky top-[96px] self-start'
-      }`}
-    >
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_20px_-4px_rgba(0,0,0,0.06)] p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="font-primary text-lg font-bold text-gray-900">Bộ lọc</h3>
-          <button
-            onClick={resetFilters}
-            className="font-primary text-[13px] font-semibold text-[#c4a946] hover:text-[#a88e30] transition-colors"
-          >
-            Đặt lại
-          </button>
-        </div>
-
-        {/* Listing Type */}
-        <div className="mb-6">
-          <label className="font-primary text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
-            <Home size={15} className="text-gray-400" />
-            Loại tin
-          </label>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {LISTING_TYPE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setListingTypeFilter(opt.value)}
-                className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all duration-200 ${
-                  listingTypeFilter === opt.value
-                    ? 'bg-[#0a1632] text-white shadow-md'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Price Range */}
-        <div className="mb-6">
-          <label className="font-primary text-sm font-bold text-gray-700 mb-3 block">
-            Khoảng giá
-          </label>
-          <div className="flex items-center gap-3 mt-2">
-            <span className="font-primary text-[12px] font-semibold text-gray-500 bg-gray-50 px-2.5 py-1.5 rounded-lg">
-              {formatRangePrice(priceRange[0])}
-            </span>
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="font-primary text-[12px] font-semibold text-gray-500 bg-gray-50 px-2.5 py-1.5 rounded-lg">
-              {formatRangePrice(priceRange[1])}
-            </span>
-          </div>
-          <input
-            type="range"
-            min={0}
-            max={50_000_000_000}
-            step={500_000_000}
-            value={priceRange[1]}
-            onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
-            className="w-full mt-3 accent-[#c4a946] cursor-pointer"
-          />
-        </div>
-
-        {/* Property Types */}
-        {availablePropertyTypes.length > 0 && (
-          <div className="mb-6">
-            <label className="font-primary text-sm font-bold text-gray-700 mb-3 block">
-              Loại bất động sản
-            </label>
-            <div className="flex flex-col gap-2.5 mt-2">
-              {availablePropertyTypes.map((type) => (
-                <label
-                  key={type.id}
-                  className="flex items-center gap-3 cursor-pointer group"
-                >
-                  <div
-                    className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-200 ${
-                      selectedPropertyTypes.includes(type.id)
-                        ? 'bg-[#0a1632] border-[#0a1632]'
-                        : 'border-gray-300 group-hover:border-gray-400'
-                    }`}
-                  >
-                    {selectedPropertyTypes.includes(type.id) && (
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="white"
-                        strokeWidth="3"
-                      >
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    )}
-                  </div>
-                  <span className="font-primary text-[14px] text-gray-700 group-hover:text-gray-900 transition-colors">
-                    {type.name}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Apply button (mobile) */}
-        {isMobile && (
-          <button
-            onClick={() => setIsMobileFilterOpen(false)}
-            className="w-full mt-4 py-3 bg-[#0a1632] text-white font-primary text-sm font-bold rounded-xl hover:bg-[#0d1d42] transition-colors"
-          >
-            Áp dụng bộ lọc
-          </button>
-        )}
-      </div>
-    </aside>
-  );
-
-  /* ────────────────────────────── Render ────────────────────────────── */
 
   return (
-    <div className="min-h-screen bg-[#f8f9fb] flex flex-col">
+    <div className="min-h-screen bg-[#f8f9fb] flex flex-col font-sans">
       <Navbar
         onLoginClick={() => setIsLoginOpen(true)}
         onRegisterClick={() => setIsRegisterOpen(true)}
       />
 
-      {/* Spacer for fixed navbar */}
       <div className="h-[72px]" />
 
-      {/* ===== BREADCRUMB ===== */}
-      <div className="w-full bg-white border-b border-gray-100">
-        <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-4">
-          <nav className="flex items-center gap-2 font-primary text-[13px]">
-            <a href="/" className="text-gray-400 hover:text-gray-600 transition-colors">
-              Trang chủ
-            </a>
-            <ChevronRight size={14} className="text-gray-300" />
-            <a href="/" className="text-gray-400 hover:text-gray-600 transition-colors">
-              Bất động sản
-            </a>
-            <ChevronRight size={14} className="text-gray-300" />
-            <span className="text-gray-900 font-semibold">Danh sách dự án</span>
-          </nav>
+      <div className="max-w-[1140px] mx-auto w-full px-4 sm:px-6 py-6 flex-1">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-sm mb-6">
+          <a href="/du-an" className="text-slate-500 hover:text-slate-800 transition-colors">
+            Dự án
+          </a>
+          <ChevronRight size={14} className="text-slate-400" />
+          <span className="text-slate-900 font-medium">Dự án BĐS Toàn Quốc</span>
+        </nav>
+
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-[28px] font-bold text-slate-900 tracking-tight leading-none mb-4">
+            Dự án toàn quốc
+          </h1>
+          <div className="flex items-center justify-between">
+            <p className="text-slate-600">
+              Hiện đang có <span className="font-semibold">{projects.length}</span> dự án
+            </p>
+            <div className="relative">
+              <select className="appearance-none bg-white border border-slate-200 rounded-lg pl-4 pr-10 py-2 text-sm font-medium text-slate-700 outline-none hover:border-slate-300 transition-colors cursor-pointer">
+                <option value="newest">Mới nhất</option>
+                <option value="price_asc">Giá tăng dần</option>
+                <option value="price_desc">Giá giảm dần</option>
+              </select>
+              <ChevronRight size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 rotate-90 pointer-events-none" />
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* ===== MAIN CONTENT ===== */}
-      <div className="max-w-[1440px] mx-auto w-full px-6 md:px-12 py-4 md:py-6 flex-1">
-        <div className="flex gap-8">
-          {/* SIDEBAR FILTERS (Desktop) */}
-          <FiltersSidebar />
-
-          {/* LISTING AREA */}
-          <div className="flex-1 min-w-0">
-            {/* Title + Controls */}
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-4">
-              <div>
-                <h1 className="font-heading text-2xl md:text-[32px] font-bold text-[#0a1632] leading-tight italic mb-1">
-                  Danh sách bất động sản
-                </h1>
-                {!loading && (
-                  <p className="font-primary text-[13px] text-gray-400 mt-1.5">
-                    Hiển thị {(currentPage - 1) * ITEMS_PER_PAGE + 1}-
-                    {Math.min(currentPage * ITEMS_PER_PAGE, processedListings.length)} trong{' '}
-                    {processedListings.length} bất động sản
-                  </p>
-                )}
-              </div>
-
-              <div className="flex items-center gap-3">
-                {/* Mobile filter button */}
-                <button
-                  onClick={() => setIsMobileFilterOpen(true)}
-                  className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl font-primary text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  <SlidersHorizontal size={16} />
-                  Bộ lọc
-                </button>
-
-                {/* View mode toggle */}
-                <div className="flex items-center bg-white border border-gray-200 rounded-xl overflow-hidden">
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`p-2.5 transition-colors ${
-                      viewMode === 'grid'
-                        ? 'bg-[#0a1632] text-white'
-                        : 'text-gray-400 hover:text-gray-600'
-                    }`}
-                    aria-label="Grid view"
-                  >
-                    <LayoutGrid size={18} />
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`p-2.5 transition-colors ${
-                      viewMode === 'list'
-                        ? 'bg-[#0a1632] text-white'
-                        : 'text-gray-400 hover:text-gray-600'
-                    }`}
-                    aria-label="List view"
-                  >
-                    <List size={18} />
-                  </button>
-                </div>
-
-                {/* Sort dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={() => setIsSortOpen(!isSortOpen)}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl font-primary text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors min-w-[180px] justify-between"
-                  >
-                    {SORT_OPTIONS.find((o) => o.value === sortBy)?.label}
-                    <ChevronDown
-                      size={14}
-                      className={`text-gray-400 transition-transform ${isSortOpen ? 'rotate-180' : ''}`}
-                    />
-                  </button>
-
-                  {isSortOpen && (
-                    <div className="absolute right-0 mt-2 w-full bg-white rounded-xl shadow-[0_12px_40px_-8px_rgba(0,0,0,0.12)] border border-gray-100 py-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                      {SORT_OPTIONS.map((option) => (
-                        <button
-                          key={option.value}
-                          onClick={() => {
-                            setSortBy(option.value);
-                            setIsSortOpen(false);
-                          }}
-                          className={`w-full text-left px-4 py-2.5 font-primary text-sm transition-colors ${
-                            sortBy === option.value
-                              ? 'bg-gray-50 text-[#0a1632] font-bold'
-                              : 'text-gray-600 hover:bg-gray-50'
-                          }`}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
+        {/* Project List */}
+        <div className="space-y-6">
+          {isLoading ? (
+            <div className="text-center py-20 text-slate-500">Đang tải danh sách dự án...</div>
+          ) : projects.length === 0 ? (
+            <div className="text-center py-20 text-slate-500 bg-white rounded-xl border border-slate-100 shadow-sm">
+              Không có dự án nào đang được hiển thị.
+            </div>
+          ) : (
+            projects.map((project) => (
+              <div 
+                key={project.id} 
+                onClick={() => navigate(`/du-an/${project.slug || project.id}`)}
+                className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col md:flex-row group cursor-pointer"
+              >
+                {/* Images Section */}
+                <div className="w-full md:w-[260px] md:min-w-[260px] h-[200px] flex flex-col bg-slate-100 relative shrink-0 p-1 gap-1">
+                  {project.media && project.media.length > 0 ? (
+                    <>
+                      {/* Main Image */}
+                      <div className={`w-full ${project.media.length > 1 ? 'h-[65%]' : 'h-full'} relative rounded-t-lg ${project.media.length === 1 ? 'rounded-b-lg' : ''} overflow-hidden`}>
+                        <img 
+                          src={project.media[0].originalUrl} 
+                          alt={project.name} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                        />
+                      </div>
+                      
+                      {/* Sub Images (if more than 1) */}
+                      {project.media.length > 1 && (
+                        <div className="w-full h-[35%] flex gap-1">
+                          {project.media.slice(1, 3).map((m, idx) => (
+                            <div key={m.id} className={`h-full relative overflow-hidden ${project.media!.length === 2 && idx === 0 ? 'w-full rounded-b-lg' : 'w-1/2'} ${idx === 0 && project.media!.length > 2 ? 'rounded-bl-lg' : ''} ${idx === 1 ? 'rounded-br-lg' : ''}`}>
+                              <img src={m.originalUrl} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                              {idx === 1 && project.media!.length > 3 && (
+                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-medium text-sm gap-1">
+                                  <ImageIcon size={14} />
+                                  +{project.media!.length - 3}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-300">
+                      <ImageIcon size={48} />
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
 
-            {/* Search bar */}
-            <div className="mb-4">
-              <div className="relative">
-                <svg
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="m21 21-4.35-4.35" />
-                </svg>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Tìm kiếm theo tên, địa chỉ, khu vực..."
-                  className="w-full bg-white border border-gray-200 rounded-xl py-3 pl-12 pr-4 font-primary text-sm focus:ring-2 focus:ring-[#0a1632] focus:border-transparent transition-all outline-none"
-                />
-              </div>
-            </div>
-
-            {/* ── Loading skeleton ── */}
-            {loading && (
-              <div
-                className={`grid gap-7 ${
-                  viewMode === 'grid'
-                    ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3'
-                    : 'grid-cols-1'
-                }`}
-              >
-                {[...Array(6)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 animate-pulse"
-                  >
-                    <div className="aspect-[4/3] bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100" />
-                    <div className="p-5 space-y-3">
-                      <div className="h-6 bg-gray-200 rounded-lg w-2/3" />
-                      <div className="h-4 bg-gray-100 rounded w-full" />
-                      <div className="h-4 bg-gray-100 rounded w-3/4" />
-                      <div className="border-t border-gray-100 pt-3 flex gap-4">
-                        <div className="h-4 bg-gray-100 rounded w-12" />
-                        <div className="h-4 bg-gray-100 rounded w-12" />
-                        <div className="h-4 bg-gray-100 rounded w-14" />
-                      </div>
-                    </div>
+                {/* Info Section */}
+                <div className="p-5 flex-1 flex flex-col">
+                  <div>
+                    {getStatusBadge(project.status)}
                   </div>
-                ))}
-              </div>
-            )}
-
-            {/* ── Error state ── */}
-            {error && !loading && (
-              <div className="text-center py-20">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-50 mb-4">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#ef4444"
-                    strokeWidth="2"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 8v4M12 16h.01" />
-                  </svg>
-                </div>
-                <p className="font-primary text-gray-500 text-base">{error}</p>
-                <button
-                  onClick={() => window.location.reload()}
-                  className="mt-4 px-6 py-2.5 bg-[#0a1632] text-white font-primary text-sm font-bold hover:bg-[#0d1d42] transition-colors rounded-xl"
-                >
-                  Thử lại
-                </button>
-              </div>
-            )}
-
-            {/* ── Empty state ── */}
-            {!loading && !error && processedListings.length === 0 && (
-              <div className="text-center py-20">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-50 mb-5">
-                  <svg
-                    width="32"
-                    height="32"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#9ca3af"
-                    strokeWidth="1.5"
-                  >
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                    <polyline points="9 22 9 12 15 12 15 22" />
-                  </svg>
-                </div>
-                <p className="font-primary text-gray-500 text-base font-medium">
-                  Không tìm thấy bất động sản nào phù hợp
-                </p>
-                <p className="font-primary text-gray-400 text-sm mt-1">
-                  Hãy thử thay đổi bộ lọc tìm kiếm
-                </p>
-                <button
-                  onClick={resetFilters}
-                  className="mt-4 px-6 py-2.5 bg-[#0a1632] text-white font-primary text-sm font-bold hover:bg-[#0d1d42] transition-colors rounded-xl"
-                >
-                  Đặt lại bộ lọc
-                </button>
-              </div>
-            )}
-
-            {/* ── Listing Grid ── */}
-            {!loading && !error && paginatedListings.length > 0 && (
-              <>
-                <div
-                  className={`grid gap-7 ${
-                    viewMode === 'grid'
-                      ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3'
-                      : 'grid-cols-1 max-w-[800px]'
-                  }`}
-                >
-                  {paginatedListings.map((listing) => (
-                    <ListingCard key={listing.id} listing={listing} />
-                  ))}
-                </div>
-
-                {/* ── Pagination ── */}
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-2 mt-12">
-                    <button
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
-                      className="w-10 h-10 rounded-xl flex items-center justify-center border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <ChevronLeft size={18} />
-                    </button>
-
-                    {getPageNumbers().map((page, idx) =>
-                      page === 'ellipsis' ? (
-                        <span
-                          key={`ellipsis-${idx}`}
-                          className="w-10 h-10 flex items-center justify-center font-primary text-gray-400 text-sm"
-                        >
-                          …
-                        </span>
-                      ) : (
-                        <button
-                          key={page}
-                          onClick={() => setCurrentPage(page)}
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center font-primary text-sm font-bold transition-all duration-200 ${
-                            currentPage === page
-                              ? 'bg-[#0a1632] text-white shadow-lg shadow-[#0a1632]/25'
-                              : 'border border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      )
+                  
+                  <h3 className="text-xl font-bold text-slate-900 mt-2 mb-1.5 group-hover:text-blue-600 transition-colors line-clamp-1">
+                    {project.name}
+                  </h3>
+                  
+                  <div className="flex items-center gap-3 text-sm font-semibold text-slate-700 mb-2">
+                    {project.totalArea && (
+                      <span>{project.totalArea.toLocaleString('vi-VN')} m²</span>
                     )}
-
-                    <button
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={currentPage === totalPages}
-                      className="w-10 h-10 rounded-xl flex items-center justify-center border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                    >
-                      <ChevronRight size={18} />
-                    </button>
+                    {project.totalArea && project._count?.listings !== undefined && <span className="text-slate-300">·</span>}
+                    {project._count?.listings !== undefined && project._count.listings > 0 && (
+                      <span className="flex items-center gap-1.5">
+                        {project._count.listings} <Home size={16} className="text-slate-500" />
+                      </span>
+                    )}
                   </div>
-                )}
-              </>
-            )}
-          </div>
+                  
+                  <div className="text-[15px] text-slate-700 mb-3 line-clamp-1">
+                    {project.wardName ? `${project.wardName}, ` : ""}
+                    {project.districtName ? `${project.districtName}, ` : ""}
+                    {project.provinceName || "Đang cập nhật vị trí"}
+                  </div>
+                  
+                  <div className="text-[15px] text-slate-500 leading-relaxed line-clamp-2 mt-auto">
+                    {project.description || "Chưa có thông tin mô tả cho dự án này."}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
-      {/* ===== FOOTER ===== */}
       <Footer />
 
-      {/* ===== MOBILE FILTER DRAWER ===== */}
-      {isMobileFilterOpen && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-black/40 z-[200] lg:hidden"
-            onClick={() => setIsMobileFilterOpen(false)}
-          />
-          {/* Drawer */}
-          <div className="fixed inset-y-0 left-0 w-[320px] max-w-[85vw] bg-[#f8f9fb] z-[210] lg:hidden overflow-y-auto animate-in slide-in-from-left duration-300">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-white">
-              <h2 className="font-primary text-lg font-bold text-gray-900">Bộ lọc</h2>
-              <button
-                onClick={() => setIsMobileFilterOpen(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="p-4">
-              <FiltersSidebar isMobile />
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* ===== AUTH MODALS ===== */}
+      {/* Auth Modals */}
       <Modal isOpen={isRegisterOpen} onClose={() => setIsRegisterOpen(false)}>
-        <RegisterModal
-          onSwitchToLogin={handleSwitchToLogin}
-          onSuccess={handleRegisterSuccess}
-        />
+        <RegisterModal onSwitchToLogin={handleSwitchToLogin} onSuccess={handleRegisterSuccess} />
       </Modal>
       <Modal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)}>
-        <LoginModal
-          onSwitchToRegister={handleSwitchToRegister}
-          onSuccess={handleLoginSuccess}
-        />
+        <LoginModal onSwitchToRegister={handleSwitchToRegister} onSuccess={handleLoginSuccess} />
       </Modal>
       <Modal isOpen={isVerifyOtpOpen} onClose={() => setIsVerifyOtpOpen(false)}>
-        <VerifyOtpModal
-          email={pendingEmail}
-          onSuccess={handleVerifySuccess}
-          onBackToLogin={() => {
-            setIsVerifyOtpOpen(false);
-            setIsLoginOpen(true);
-          }}
-        />
+        <VerifyOtpModal email={pendingEmail} onSuccess={handleVerifySuccess} onBackToLogin={() => { setIsVerifyOtpOpen(false); setIsLoginOpen(true); }} />
       </Modal>
 
       <StatusModal />

@@ -7,6 +7,8 @@ import {
 } from "react-router-dom";
 import HomePage from "./pages/home/HomePage";
 import ProjectListingPage from "./pages/project/ProjectListingPage";
+import PropertyListingPage from "./pages/project/PropertyListingPage";
+import PropertyDetailPage from "./pages/project/PropertyDetailPage";
 import ProfilePage from "./pages/profile/ProfilePage";
 import BrokerRegistrationPage from "./pages/user/BrokerRegistrationPage";
 import ChatPage from "./pages/chat/ChatPage";
@@ -26,15 +28,18 @@ import { ToastContainer } from "./components/ui/Toast";
 import { AdminRoute } from "./components/auth/AdminRoute";
 import { AdminLayout } from "./pages/admin/AdminLayout";
 import { Dashboard } from "./pages/admin/Dashboard";
-import { BrokerApprovals } from "./pages/admin/BrokerApprovals";
-import { ListingApprovals } from "./pages/admin/ListingApprovals";
-import { ReportApprovals } from "./pages/admin/ReportApprovals";
+import { BrokerApprovals } from './pages/admin/BrokerApprovals';
+import { ListingApprovals } from './pages/admin/ListingApprovals';
+import { ProjectApprovals } from './pages/admin/ProjectApprovals';
+import { ReportApprovals } from './pages/admin/ReportApprovals';
 
 // Agent imports
 import { AgentRoute } from "./components/auth/AgentRoute";
 import { AgentLayout } from "./pages/agent/AgentLayout";
 import { AgentDashboard } from "./pages/agent/AgentDashboard";
 import { AgentPostPage } from "./pages/agent/AgentPostPage";
+import { AgentProjectDashboard } from "./pages/agent/AgentProjectDashboard";
+import { AgentProjectPostPage } from "./pages/agent/AgentProjectPostPage";
 
 /**
  * App - main router entry point.
@@ -68,6 +73,8 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/du-an" element={<ProjectListingPage />} />
+        <Route path="/bat-dong-san" element={<PropertyListingPage />} />
+        <Route path="/bat-dong-san/:id" element={<PropertyDetailPage />} />
         <Route path="/du-an/:id" element={<ProjectDetailPage />} />
         <Route path="/yeu-thich" element={isAuthenticated ? <FavoritesPage /> : <Navigate to="/" />} />
         <Route path="/login" element={<LoginPage />} />
@@ -102,6 +109,7 @@ function App() {
           <Route path="broker-approvals" element={<BrokerApprovals />} />
           <Route path="listing-approvals" element={<ListingApprovals />} />
           <Route path="report-approvals" element={<ReportApprovals />} />
+          <Route path="project-approvals" element={<ProjectApprovals />} />
         </Route>
 
         {/* Agent Routes - Only accessible by AGENT role */}
@@ -117,6 +125,9 @@ function App() {
           <Route path="dashboard" element={<AgentDashboard />} />
           <Route path="post" element={<AgentPostPage />} />
           <Route path="edit/:id" element={<AgentPostPage />} />
+          <Route path="projects" element={<AgentProjectDashboard />} />
+          <Route path="project-post" element={<AgentProjectPostPage />} />
+          <Route path="project-edit/:id" element={<AgentProjectPostPage />} />
           {/* Clients, Analytics, Settings routes placeholder... */}
         </Route>
 

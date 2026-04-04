@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Navbar } from "../../components/layout/Navbar";
 import { Footer } from "../../components/layout/Footer";
@@ -6,22 +6,46 @@ import { Modal } from "../../components/ui/Modal";
 import { RegisterModal } from "../../components/auth/RegisterModal";
 import { LoginModal } from "../../components/auth/LoginModal";
 import { VerifyOtpModal } from "../../components/auth/VerifyOtpModal";
-import { useProjectDetail } from "../../hooks/useProjectDetail";
-import { Flag, Home, Image as ImageIcon } from "lucide-react";
+import { Flag, Home, BedDouble, Bath, MapPin } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
-import { ListingCard } from "../../components/listing/ListingCard";
+import { listingApi } from "../../api/listing.api";
+import type { Listing } from "../../types/listing.types";
 
-export default function ProjectDetailPage() {
+export default function PropertyDetailPage() {
   const { id } = useParams();
-  const { project, loading, error } = useProjectDetail(id);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
+
+  const [listing, setListing] = useState<Listing | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Auth modal states
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isVerifyOtpOpen, setIsVerifyOtpOpen] = useState(false);
   const [pendingEmail, setPendingEmail] = useState("");
+
+  useEffect(() => {
+    const fetchListing = async () => {
+      try {
+        setLoading(true);
+        if (!id) return;
+        const res = await listingApi.getPublicListingById(id);
+        if (res.success && res.data) {
+          setListing(res.data);
+        } else {
+          setError("Không tìm thấy bất động sản.");
+        }
+      } catch (err: any) {
+        console.error(err);
+        setError("Không tìm thấy bất động sản.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchListing();
+  }, [id]);
 
   const handleSwitchToLogin = () => {
     setIsRegisterOpen(false);
@@ -44,14 +68,6 @@ export default function ProjectDetailPage() {
     setIsLoginOpen(false);
   };
 
-  const getStatusBadge = (status: string | undefined) => {
-    if (!status) return <span className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded text-sm font-medium">Đang cập nhật</span>;
-    if (status === 'Sắp mở bán') return <span className="px-3 py-1.5 bg-red-50 text-red-600 rounded text-sm font-medium">{status}</span>;
-    if (status === 'Đang mở bán') return <span className="px-3 py-1.5 bg-green-50 text-green-600 rounded text-sm font-medium">{status}</span>;
-    if (status === 'Đã bàn giao') return <span className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded text-sm font-medium">{status}</span>;
-    return <span className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded text-sm font-medium">{status}</span>;
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center">
@@ -61,36 +77,38 @@ export default function ProjectDetailPage() {
     );
   }
 
-  if (error || !project) {
+  if (error || !listing) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center">
         <p className="font-primary text-red-500 text-lg">
-          {error || "Không tìm thấy dự án"}
+          {error || "Không tìm thấy bất động sản"}
         </p>
         <button
-          onClick={() => (window.location.href = "/du-an")}
+          onClick={() => (window.location.href = "/bat-dong-san")}
           className="mt-4 px-6 py-2 bg-[#111] text-white rounded"
         >
-          Trở về danh sách dự án
+          Trở về danh sách bất động sản
         </button>
       </div>
     );
   }
 
-  const primaryMedia = project.media?.find((m: any) => m.isPrimary) || project.media?.[0];
+  const primaryMedia = listing.media?.find((m: any) => m.isPrimary) || listing.media?.[0];
   const propertyImg = primaryMedia
     ? primaryMedia.originalUrl
     : "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=1200";
   const subImages =
-    project.media?.filter((m: any) => m.id !== primaryMedia?.id).slice(0, 4) || [];
+    listing.media?.filter((m: any) => m.id !== primaryMedia?.id).slice(0, 4) || [];
   const displaySubImages = [...subImages];
   while (displaySubImages.length < 4) {
     displaySubImages.push({ originalUrl: propertyImg } as any);
   }
 
-  const addressDisplay = [project.addressText, project.wardName, project.districtName, project.provinceName]
-    .filter(Boolean)
-    .join(', ');
+  const formatPrice = (p: number) => {
+    if (p >= 1000000000) return `${(p / 1000000000).toFixed(1)} tỷ`;
+    if (p >= 1000000) return `${(p / 1000000).toFixed(0)} triệu`;
+    return new Intl.NumberFormat('vi-VN').format(p);
+  };
 
   return (
     <div className="min-h-screen bg-white flex flex-col overflow-x-hidden">
@@ -125,34 +143,56 @@ export default function ProjectDetailPage() {
           <div>
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-2">
               <h1 className="font-heading text-3xl font-bold text-[#111] uppercase line-clamp-2">
-                {project.name}
+                {listing.title}
               </h1>
             </div>
-            <p className="text-gray-500 font-primary text-lg mb-6">
-              {addressDisplay}
+            <p className="text-gray-500 font-primary text-lg mb-6 flex items-start gap-2">
+              <MapPin size={20} className="text-[#c4a946] mt-1 shrink-0" />
+              {listing.addressDisplay}
             </p>
+
+            <div className="mb-6 flex flex-wrap gap-2">
+              <span className="inline-flex px-3 py-1 rounded-md bg-gray-100 text-[12px] font-bold text-gray-800 uppercase tracking-wide">
+                {listing.propertyType?.name || 'Bất động sản'}
+              </span>
+              {listing.project && (
+                <span className="inline-flex px-3 py-1 rounded-md bg-blue-50 text-[12px] font-bold text-blue-600 uppercase tracking-wide cursor-pointer hover:bg-blue-100 transition-colors" onClick={() => navigate(`/du-an/${listing.project!.slug || listing.project!.id}`)} title="Thuộc dự án (Nhấn để xem dự án)">
+                  Dự án: {listing.project.name}
+                </span>
+              )}
+            </div>
 
             <div className="flex flex-wrap items-center gap-8 py-6 border-y border-gray-100 mb-8">
               <div>
-                <p className="text-gray-400 text-xs uppercase mb-1">Trạng thái</p>
+                <p className="text-gray-400 text-xs uppercase mb-1">Mức giá</p>
                 <div className="mt-1">
-                  {getStatusBadge(project.status)}
+                  <span className="font-heading text-2xl font-bold text-[#c4a946]">
+                     {formatPrice(listing.price)} {listing.priceUnit === 'VND' ? '₫' : listing.priceUnit}
+                  </span>
                 </div>
               </div>
               <div>
                 <p className="text-gray-400 text-xs uppercase mb-1">
-                  Tổng diện tích
+                  Diện tích
                 </p>
                 <p className="font-heading text-2xl font-bold text-[#111]">
-                  {project.totalArea ? `${project.totalArea.toLocaleString('vi-VN')} m²` : '--'}
+                  {listing.areaGross ? `${listing.areaGross.toLocaleString('vi-VN')} m²` : '--'}
                 </p>
               </div>
               <div>
                 <p className="text-gray-400 text-xs uppercase mb-1">
-                  Bất động sản
+                  Phòng ngủ
                 </p>
                 <p className="font-heading text-2xl font-bold text-[#111] flex items-center gap-2">
-                   {project.listings?.length || 0} <Home size={20} className="text-slate-400" />
+                   {listing.attributes?.beds || '-'} <BedDouble size={20} className="text-slate-400" />
+                </p>
+              </div>
+              <div>
+                <p className="text-gray-400 text-xs uppercase mb-1">
+                  Số phòng
+                </p>
+                <p className="font-heading text-2xl font-bold text-[#111] flex items-center gap-2">
+                   {listing.attributes?.rooms || '-'} <Bath size={20} className="text-slate-400" />
                 </p>
               </div>
             </div>
@@ -161,31 +201,36 @@ export default function ProjectDetailPage() {
               Thông tin mô tả
             </h2>
             <div className="prose max-w-none text-gray-600 font-primary leading-relaxed whitespace-pre-line mb-10">
-              {project.description ||
-                "Chưa có mô tả chi tiết cho dự án này."}
+              {listing.attributes?.description ||
+                "Chưa có mô tả chi tiết cho bất động sản này."}
+            </div>
+          </div>
+          
+          <div>
+            <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 sticky top-[100px]">
+              <h3 className="font-heading text-lg font-bold text-[#111] mb-6">Liên hệ môi giới</h3>
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200">
+                  {listing.user?.profile?.avatarUrl ? (
+                    <img src={listing.user.profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-200 uppercase font-bold text-xl">
+                      {listing.user?.profile?.displayName?.charAt(0) || listing.user?.email?.charAt(0) || '?'}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <h4 className="font-bold text-gray-900">{listing.user?.profile?.displayName || 'Môi giới dự án'}</h4>
+                  <p className="text-sm text-gray-500">{listing.user?.email}</p>
+                </div>
+              </div>
+              <button className="w-full py-3 bg-[#111] text-white rounded-xl font-bold hover:bg-[#333] transition-colors">
+                Gửi tin nhắn
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Khối Danh sách Bất động sản */}
-        <div className="mt-8 border-t border-gray-200 pt-10">
-          <h2 className="font-heading text-2xl font-bold text-[#111] mb-6 border-l-4 border-[#c4a946] pl-4 uppercase">
-            Danh sách Bất động sản thuộc dự án
-          </h2>
-          {project.listings && project.listings.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {project.listings.map((listing) => (
-                <div key={listing.id} className="cursor-pointer" onClick={() => navigate(`/nha-dat/${listing.slug || listing.id}`)}>
-                  <ListingCard listing={listing} />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 font-primary">
-              Chưa có bất động sản nào đang mở bán hoặc cho thuê trong dự án này.
-            </p>
-          )}
-        </div>
       </main>
 
       <Footer />

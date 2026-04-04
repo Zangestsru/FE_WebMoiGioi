@@ -33,6 +33,11 @@ export interface Listing {
   status: string;
   media: ListingMedia[];
   propertyType?: PropertyType;
+  project?: {
+    id: string;
+    name: string;
+    slug?: string;
+  };
   user?: ListingUser;
   attributes?: Record<string, any>;
   views?: number;

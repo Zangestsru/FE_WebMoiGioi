@@ -98,7 +98,7 @@ export function ListingCard({ listing }: Readonly<ListingCardProps>) {
   return (
     <article
       id={`listing-card-${listing.id}`}
-      onClick={() => navigate(`/du-an/${listing.id}`)}
+      onClick={() => navigate(`/bat-dong-san/${listing.slug || listing.id}`)}
       className="group relative bg-white rounded-2xl overflow-hidden shadow-[0_2px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.15)] transition-all duration-500 ease-out cursor-pointer border border-gray-100/60 hover:border-gray-200/80"
     >
       {/* IMAGE CONTAINER */}
@@ -177,11 +177,16 @@ export function ListingCard({ listing }: Readonly<ListingCardProps>) {
           {listing.title}
         </h3>
 
-        {/* Property Type */}
-        <div className="mb-3">
+        {/* Property Type and Project */}
+        <div className="mb-3 flex flex-wrap gap-2">
           <span className="inline-flex px-2 py-0.5 rounded-md bg-gray-100 text-[10px] font-bold text-gray-600 uppercase tracking-wide">
             {propertyTypeName}
           </span>
+          {listing.project && (
+            <span className="inline-flex px-2 py-0.5 rounded-md bg-blue-50 text-[10px] font-bold text-blue-600 uppercase tracking-wide truncate max-w-full" title={`Dự án: ${listing.project.name}`}>
+              {listing.project.name}
+            </span>
+          )}
         </div>
 
         {/* Address */}
