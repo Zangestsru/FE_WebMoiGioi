@@ -67,5 +67,18 @@ export const userApi = {
     const response = await axiosClient.post<ApiResponse<void>>('/user/set-password', data);
     return response.data;
   },
+
+  /**
+   * Admin: Get user count (non-admin users) with monthly comparison
+   */
+  getAdminUserCount: async (): Promise<ApiResponse<{
+    total: number;
+    thisMonth: number;
+    lastMonth: number;
+    changePercent: number;
+  }>> => {
+    const response = await axiosClient.get('/user/admin/user-count');
+    return response.data;
+  },
 };
 

@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import type { AuthUserDTO } from '../types/auth.types';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import type { AuthUserDTO } from "../types/auth.types";
 
 interface AuthState {
   user: AuthUserDTO | null;
@@ -18,16 +18,17 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       isAuthenticated: false,
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
+      setUser: (user) => {
+        set({ user, isAuthenticated: !!user });
+      },
       logout: () => {
         set({ user: null, isAuthenticated: false });
-        // Clear cookies manually if needed, or let BE handle it via /logout
-        localStorage.removeItem('user-storage');
+        localStorage.removeItem("user-storage");
       },
     }),
     {
-      name: 'user-storage',
+      name: "user-storage",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );

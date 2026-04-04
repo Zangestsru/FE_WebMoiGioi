@@ -9,10 +9,11 @@ import { FormButton } from '../ui/FormButton';
  */
 interface LoginModalProps {
   onSwitchToRegister?: () => void;
+  onSwitchToForgotPassword?: () => void;
   onSuccess?: () => void;
 }
 
-export function LoginModal({ onSwitchToRegister, onSuccess }: LoginModalProps) {
+export function LoginModal({ onSwitchToRegister, onSwitchToForgotPassword, onSuccess }: LoginModalProps) {
   const {
     formState,
     errors,
@@ -26,10 +27,10 @@ export function LoginModal({ onSwitchToRegister, onSuccess }: LoginModalProps) {
 
 
   return (
-    <div className="flex h-full w-full flex-col sm:flex-row bg-white">
+    <div className="flex w-full flex-col sm:flex-row bg-white overflow-hidden">
       {/* LEFT: Image panel (Synchronized) */}
       <div
-        className="relative w-full sm:w-[440px] shrink-0 bg-cover bg-center bg-no-repeat rounded-t-xl sm:rounded-none sm:rounded-l-xl overflow-hidden bg-[#0a1632] flex items-end p-6 h-[140px] sm:h-full"
+        className="relative w-full sm:w-[440px] shrink-0 bg-cover bg-center bg-no-repeat rounded-t-xl sm:rounded-none sm:rounded-l-xl overflow-hidden bg-[#0a1632] flex items-end p-6 h-[160px] sm:h-auto"
         style={{
           backgroundImage: import.meta.env.VITE_REGISTER_BG_IMAGE
             ? `url('${import.meta.env.VITE_REGISTER_BG_IMAGE}')`
@@ -102,9 +103,13 @@ export function LoginModal({ onSwitchToRegister, onSuccess }: LoginModalProps) {
           </form>
 
           <div className="flex flex-col gap-2 mt-3 shrink-0">
-            <a href="/forgot-password" className="text-blue-500 font-semibold no-underline hover:underline text-sm font-primary text-center">
+            <button
+              type="button"
+              className="text-blue-500 font-semibold no-underline hover:underline text-sm font-primary text-center bg-transparent border-none p-0 cursor-pointer"
+              onClick={onSwitchToForgotPassword}
+            >
               Quên mật khẩu?
-            </a>
+            </button>
 
             {/* Divider */}
             <div className="relative flex items-center gap-3 my-4">

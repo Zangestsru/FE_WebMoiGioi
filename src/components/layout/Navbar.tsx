@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, LogOut, User as UserIcon, ChevronDown, Menu, X } from 'lucide-react';
+import { Search, LogOut, User as UserIcon, ChevronDown, Menu, X, Briefcase, LayoutDashboard, MessageCircle, Heart } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
+import { useFavoriteStore } from '../../store/useFavoriteStore';
 
 interface NavbarProps {
   onLoginClick: () => void;
   onRegisterClick: () => void;
 }
 
-export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
+export function Navbar({ onLoginClick, onRegisterClick }: Readonly<NavbarProps>) {
   const { user, isAuthenticated, logout } = useAuthStore();
+  const { favoriteIds } = useFavoriteStore();
   const navigate = useNavigate();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -35,9 +37,7 @@ export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
         {/* NAVIGATION LINKS - Desktop */}
         <div className="hidden lg:flex items-center gap-8">
           {[
-            { label: 'Mua', href: '#mua' },
-            { label: 'Bán', href: '#ban' },
-            { label: 'Dự án', href: '#du-an' },
+            { label: 'Bất động sản', href: '/bat-dong-san' },
             { label: 'Tin tức', href: '#tin-tuc' }
           ].map((item) => (
             <a
@@ -48,6 +48,12 @@ export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
               {item.label}
             </a>
           ))}
+          <Link
+            to="/du-an"
+            className="font-primary text-[15px] font-semibold text-gray-700 hover:text-black transition-colors"
+          >
+            Dự án
+          </Link>
         </div>
 
         {/* SEARCH BAR - Desktop */}
@@ -93,6 +99,43 @@ export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
                     <UserIcon size={18} />
                     Hồ sơ
                   </Link>
+                  <Link
+                    to="/chat"
+                    onClick={() => setIsUserMenuOpen(false)}
+                    className="w-full flex items-center gap-3.5 px-5 py-3 hover:bg-gray-50 transition-colors font-primary text-sm font-bold text-gray-700"
+                  >
+                    <MessageCircle size={18} />
+                    Tin nhắn
+                  </Link>
+                  <Link
+                    to="/yeu-thich"
+                    onClick={() => setIsUserMenuOpen(false)}
+                    className="w-full flex items-center gap-3.5 px-5 py-3 hover:bg-gray-50 transition-colors font-primary text-sm font-bold text-gray-700"
+                  >
+                    <Heart size={18} />
+                    BĐS Yêu thích
+                  </Link>
+                  {user?.accountType === 'MEMBER' && (
+                    <Link
+                      to="/user/register-broker"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="w-full flex items-center gap-3.5 px-5 py-3 hover:bg-gray-50 transition-colors font-primary text-sm font-bold text-gray-700"
+                    >
+                      <Briefcase size={18} />
+                      Trở thành môi giới
+                    </Link>
+                  )}
+                  {user?.accountType === 'AGENT' && (
+                    <Link
+                      to="/agent/dashboard"
+                      target="_blank"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="w-full flex items-center gap-3.5 px-5 py-3 hover:bg-gray-50 transition-colors font-primary text-sm font-bold text-gray-700"
+                    >
+                      <LayoutDashboard size={18} />
+                      Dashboard Môi Giới
+                    </Link>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3.5 px-5 py-3 text-red-500 hover:bg-red-50 transition-colors font-primary text-sm font-bold"
@@ -135,9 +178,7 @@ export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
         <div className="lg:hidden fixed inset-0 top-[72px] bg-white z-[90] flex flex-col p-6 gap-6 animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex flex-col gap-4">
             {[
-              { label: 'Mua', href: '#mua' },
-              { label: 'Bán', href: '#ban' },
-              { label: 'Dự án', href: '#du-an' },
+              { label: 'Bất động sản', href: '/bat-dong-san' },
               { label: 'Tin tức', href: '#tin-tuc' }
             ].map((item) => (
               <a
@@ -149,6 +190,13 @@ export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
                 {item.label}
               </a>
             ))}
+            <Link
+              to="/du-an"
+              className="font-primary text-lg font-bold text-gray-900 border-b border-gray-50 pb-4"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Dự án
+            </Link>
             {isAuthenticated ? (
               <>
                 <Link
@@ -159,6 +207,35 @@ export function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
                   <UserIcon size={20} />
                   Hồ sơ
                 </Link>
+                <Link
+                  to="/chat"
+                  className="font-primary text-lg font-bold text-gray-900 border-b border-gray-50 pb-4 flex items-center gap-3"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <MessageCircle size={20} />
+                  Tin nhắn
+                </Link>
+                {user?.accountType === 'MEMBER' && (
+                  <Link
+                    to="/user/register-broker"
+                    className="font-primary text-lg font-bold text-gray-900 border-b border-gray-50 pb-4 flex items-center gap-3"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Briefcase size={20} />
+                    Trở thành môi giới
+                  </Link>
+                )}
+                {user?.accountType === 'AGENT' && (
+                  <Link
+                    to="/agent/dashboard"
+                    target="_blank"
+                    className="font-primary text-lg font-bold text-gray-900 border-b border-gray-50 pb-4 flex items-center gap-3"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <LayoutDashboard size={20} />
+                    Dashboard Môi Giới
+                  </Link>
+                )}
                 <button
                   onClick={() => {
                     handleLogout();
