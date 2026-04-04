@@ -9,10 +9,11 @@ import { FormButton } from '../ui/FormButton';
  */
 interface LoginModalProps {
   onSwitchToRegister?: () => void;
+  onSwitchToForgotPassword?: () => void;
   onSuccess?: () => void;
 }
 
-export function LoginModal({ onSwitchToRegister, onSuccess }: LoginModalProps) {
+export function LoginModal({ onSwitchToRegister, onSwitchToForgotPassword, onSuccess }: LoginModalProps) {
   const {
     formState,
     errors,
@@ -102,9 +103,13 @@ export function LoginModal({ onSwitchToRegister, onSuccess }: LoginModalProps) {
           </form>
 
           <div className="flex flex-col gap-2 mt-3 shrink-0">
-            <a href="/forgot-password" className="text-blue-500 font-semibold no-underline hover:underline text-sm font-primary text-center">
+            <button
+              type="button"
+              className="text-blue-500 font-semibold no-underline hover:underline text-sm font-primary text-center bg-transparent border-none p-0 cursor-pointer"
+              onClick={onSwitchToForgotPassword}
+            >
               Quên mật khẩu?
-            </a>
+            </button>
 
             {/* Divider */}
             <div className="relative flex items-center gap-3 my-4">

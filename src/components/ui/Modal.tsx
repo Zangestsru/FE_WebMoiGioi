@@ -8,9 +8,14 @@ interface ModalProps {
   maxWidth?: string;
 }
 
+let modalActiveCount = 0;
+let originalBodyPadding = '';
+let originalBodyOverflow = '';
+let originalNavPadding = '';
+
 /**
  * Reusable Modal component using Tailwind.
- * Handles backdrop click, ESC key, body scroll lock.
+ * Handles backdrop click, ESC key, body scroll lock, and scrollbar compensation.
  */
 export function Modal({ isOpen, onClose, children, maxWidth = "920px" }: ModalProps) {
   // Close on ESC key
@@ -23,10 +28,45 @@ export function Modal({ isOpen, onClose, children, maxWidth = "920px" }: ModalPr
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Lock body scroll when modal open
+  // Lock body scroll and compensate for scrollbar width to prevent layout shift
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    if (!isOpen) return;
+
+    modalActiveCount++;
+
+    if (modalActiveCount === 1) {
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      
+      originalBodyPadding = document.body.style.paddingRight;
+      originalBodyOverflow = document.body.style.overflow;
+      
+      // Lock body scroll and apply compensatory padding
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+      // Compensate for fixed navbars to prevent them from jumping
+      const navbar = document.querySelector('nav.fixed') as HTMLElement;
+      if (navbar) {
+        const computedPadding = window.getComputedStyle(navbar).paddingRight;
+        const currentPad = parseFloat(computedPadding) || 0;
+        originalNavPadding = navbar.style.paddingRight;
+        navbar.style.paddingRight = `${currentPad + scrollbarWidth}px`;
+      }
+    }
+
+    return () => {
+      modalActiveCount--;
+      
+      if (modalActiveCount === 0) {
+        document.body.style.overflow = originalBodyOverflow;
+        document.body.style.paddingRight = originalBodyPadding;
+        
+        const navbar = document.querySelector('nav.fixed') as HTMLElement;
+        if (navbar) {
+          navbar.style.paddingRight = originalNavPadding;
+        }
+      }
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
