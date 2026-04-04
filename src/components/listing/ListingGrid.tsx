@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { listingApi } from '../../api/listing.api';
-import { ListingCard } from './ListingCard';
-import type { Listing } from '../../types/listing.types';
-import { ArrowRight } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { listingApi } from "../../api/listing.api";
+import { ListingCard } from "./ListingCard";
+import type { Listing } from "../../types/listing.types";
+import { ArrowRight } from "lucide-react";
 
 export function ListingGrid() {
   const [listings, setListings] = useState<Listing[]>([]);
@@ -18,8 +18,8 @@ export function ListingGrid() {
           setListings(response.data);
         }
       } catch (err: any) {
-        console.error('Failed to fetch listings:', err);
-        setError('Không thể tải danh sách tin đăng. Vui lòng thử lại.');
+        console.error("Failed to fetch listings:", err);
+        setError("Không thể tải danh sách tin đăng. Vui lòng thử lại.");
       } finally {
         setLoading(false);
       }
@@ -39,7 +39,8 @@ export function ListingGrid() {
           Bất động sản nổi bật
         </h2>
         <p className="font-primary text-gray-400 text-sm mt-3 max-w-lg leading-relaxed">
-          Các kiệt tác kiến trúc được tuyển chọn kỹ lưỡng về thiết kế, vị trí và sự sang trọng vượt trội.
+          Các kiệt tác kiến trúc được tuyển chọn kỹ lưỡng về thiết kế, vị trí và
+          sự sang trọng vượt trội.
         </p>
       </div>
 
@@ -48,7 +49,10 @@ export function ListingGrid() {
         className="inline-flex items-center gap-2 font-primary text-[13px] font-bold uppercase tracking-[0.15em] text-[#0a1632] hover:text-[#d4af37] transition-colors shrink-0 group"
       >
         Xem toàn bộ danh mục
-        <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
+        <ArrowRight
+          size={15}
+          className="transition-transform group-hover:translate-x-1"
+        />
       </a>
     </div>
   );
@@ -56,12 +60,18 @@ export function ListingGrid() {
   /* ── Loading skeleton ── */
   if (loading) {
     return (
-      <section id="listings-section" className="w-full max-w-[1440px] mx-auto px-6 md:px-12 py-16 md:py-20">
+      <section
+        id="listings-section"
+        className="w-full max-w-[1440px] mx-auto px-6 md:px-12 py-16 md:py-20"
+      >
         <SectionHeader />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 animate-pulse">
+            <div
+              key={i}
+              className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 animate-pulse"
+            >
               <div className="aspect-[4/3] bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100" />
               <div className="p-5 space-y-3">
                 <div className="h-6 bg-gray-200 rounded-lg w-2/3" />
@@ -83,11 +93,21 @@ export function ListingGrid() {
   /* ── Error state ── */
   if (error) {
     return (
-      <section id="listings-section" className="w-full max-w-[1440px] mx-auto px-6 md:px-12 py-16 md:py-20">
+      <section
+        id="listings-section"
+        className="w-full max-w-[1440px] mx-auto px-6 md:px-12 py-16 md:py-20"
+      >
         <SectionHeader />
         <div className="text-center py-16">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-50 mb-4">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#ef4444"
+              strokeWidth="2"
+            >
               <circle cx="12" cy="12" r="10" />
               <path d="M12 8v4M12 16h.01" />
             </svg>
@@ -107,11 +127,21 @@ export function ListingGrid() {
   /* ── Empty state ── */
   if (listings.length === 0) {
     return (
-      <section id="listings-section" className="w-full max-w-[1440px] mx-auto px-6 md:px-12 py-16 md:py-20">
+      <section
+        id="listings-section"
+        className="w-full max-w-[1440px] mx-auto px-6 md:px-12 py-16 md:py-20"
+      >
         <SectionHeader />
         <div className="text-center py-16">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-50 mb-5">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#9ca3af"
+              strokeWidth="1.5"
+            >
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
               <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
@@ -129,7 +159,10 @@ export function ListingGrid() {
 
   /* ── Listing grid ── */
   return (
-    <section id="listings-section" className="w-full max-w-[1440px] mx-auto px-6 md:px-12 py-16 md:py-20">
+    <section
+      id="listings-section"
+      className="w-full max-w-[1440px] mx-auto px-6 md:px-12 py-16 md:py-20"
+    >
       <SectionHeader />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">

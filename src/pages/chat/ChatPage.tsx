@@ -37,7 +37,7 @@ const isFileUrl = (url: string) => url.startsWith("http") && !isImageUrl(url);
 
 export default function ChatPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const conversationIdFromUrl = searchParams.get("conversationId");
   const { user } = useAuthStore();
   const { messages, joinRoom, leaveRoom, sendMessage, clearMessages } =
@@ -80,13 +80,15 @@ export default function ChatPage() {
   useEffect(() => {
     if (conversations.length > 0 && conversationIdFromUrl) {
       if (activeConversation?.id !== conversationIdFromUrl) {
-        const target = conversations.find(c => c.id === conversationIdFromUrl);
+        const target = conversations.find(
+          (c) => c.id === conversationIdFromUrl,
+        );
         if (target) {
           handleSelectConversation(target);
         }
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations, conversationIdFromUrl, activeConversation]);
 
   const handleSelectConversation = async (conversation: Conversation) => {
@@ -316,7 +318,12 @@ export default function ChatPage() {
                     <button
                       key={conversation.id}
                       type="button"
-                      onClick={() => handleSelectConversation(conversation)}
+                      onClick={() => {
+                        setSearchParams(
+                          { conversationId: conversation.id },
+                          { replace: true }
+                        );
+                      }}
                       className={`w-full rounded-[10px] border p-3 text-left transition ${
                         isActive
                           ? "border-chat-gold/30 bg-chat-gold/10"

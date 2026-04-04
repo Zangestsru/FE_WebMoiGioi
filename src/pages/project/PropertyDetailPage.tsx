@@ -6,10 +6,11 @@ import { Modal } from "../../components/ui/Modal";
 import { RegisterModal } from "../../components/auth/RegisterModal";
 import { LoginModal } from "../../components/auth/LoginModal";
 import { VerifyOtpModal } from "../../components/auth/VerifyOtpModal";
-import { Flag, Home, BedDouble, Bath, MapPin } from "lucide-react";
+import { BedDouble, Bath, MapPin } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { listingApi } from "../../api/listing.api";
 import type { Listing } from "../../types/listing.types";
+import { getOrCreateConversation } from "@/api/chat.api";
 
 export default function PropertyDetailPage() {
   const { id } = useParams();
@@ -25,6 +26,7 @@ export default function PropertyDetailPage() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isVerifyOtpOpen, setIsVerifyOtpOpen] = useState(false);
   const [pendingEmail, setPendingEmail] = useState("");
+  const [isContacting, setIsContacting] = useState(false);
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -68,6 +70,31 @@ export default function PropertyDetailPage() {
     setIsLoginOpen(false);
   };
 
+  const handleContact = async () => {
+    if (!id) return;
+    try {
+      setIsContacting(true);
+      const conversation = await getOrCreateConversation(id);
+      if (conversation && conversation.id) {
+        navigate(`/chat?conversationId=${conversation.id}`);
+      }
+    } catch (err: any) {
+      console.error("Error creating conversation:", err);
+      if (err?.response?.status === 401 || err?.response?.status === 403) {
+        setIsLoginOpen(true);
+      } else {
+        const errorMessage =
+          err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          err.message ||
+          "Có lỗi xảy ra khi tạo cuộc trò chuyện. Vui lòng thử lại.";
+        alert(errorMessage);
+      }
+    } finally {
+      setIsContacting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center">
@@ -93,12 +120,14 @@ export default function PropertyDetailPage() {
     );
   }
 
-  const primaryMedia = listing.media?.find((m: any) => m.isPrimary) || listing.media?.[0];
+  const primaryMedia =
+    listing.media?.find((m: any) => m.isPrimary) || listing.media?.[0];
   const propertyImg = primaryMedia
     ? primaryMedia.originalUrl
     : "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=1200";
   const subImages =
-    listing.media?.filter((m: any) => m.id !== primaryMedia?.id).slice(0, 4) || [];
+    listing.media?.filter((m: any) => m.id !== primaryMedia?.id).slice(0, 4) ||
+    [];
   const displaySubImages = [...subImages];
   while (displaySubImages.length < 4) {
     displaySubImages.push({ originalUrl: propertyImg } as any);
@@ -107,7 +136,7 @@ export default function PropertyDetailPage() {
   const formatPrice = (p: number) => {
     if (p >= 1000000000) return `${(p / 1000000000).toFixed(1)} tỷ`;
     if (p >= 1000000) return `${(p / 1000000).toFixed(0)} triệu`;
-    return new Intl.NumberFormat('vi-VN').format(p);
+    return new Intl.NumberFormat("vi-VN").format(p);
   };
 
   return (
@@ -153,10 +182,18 @@ export default function PropertyDetailPage() {
 
             <div className="mb-6 flex flex-wrap gap-2">
               <span className="inline-flex px-3 py-1 rounded-md bg-gray-100 text-[12px] font-bold text-gray-800 uppercase tracking-wide">
-                {listing.propertyType?.name || 'Bất động sản'}
+                {listing.propertyType?.name || "Bất động sản"}
               </span>
               {listing.project && (
-                <span className="inline-flex px-3 py-1 rounded-md bg-blue-50 text-[12px] font-bold text-blue-600 uppercase tracking-wide cursor-pointer hover:bg-blue-100 transition-colors" onClick={() => navigate(`/du-an/${listing.project!.slug || listing.project!.id}`)} title="Thuộc dự án (Nhấn để xem dự án)">
+                <span
+                  className="inline-flex px-3 py-1 rounded-md bg-blue-50 text-[12px] font-bold text-blue-600 uppercase tracking-wide cursor-pointer hover:bg-blue-100 transition-colors"
+                  onClick={() =>
+                    navigate(
+                      `/du-an/${listing.project!.slug || listing.project!.id}`,
+                    )
+                  }
+                  title="Thuộc dự án (Nhấn để xem dự án)"
+                >
                   Dự án: {listing.project.name}
                 </span>
               )}
@@ -167,7 +204,8 @@ export default function PropertyDetailPage() {
                 <p className="text-gray-400 text-xs uppercase mb-1">Mức giá</p>
                 <div className="mt-1">
                   <span className="font-heading text-2xl font-bold text-[#c4a946]">
-                     {formatPrice(listing.price)} {listing.priceUnit === 'VND' ? '₫' : listing.priceUnit}
+                    {formatPrice(listing.price)}{" "}
+                    {listing.priceUnit === "VND" ? "₫" : listing.priceUnit}
                   </span>
                 </div>
               </div>
@@ -176,7 +214,9 @@ export default function PropertyDetailPage() {
                   Diện tích
                 </p>
                 <p className="font-heading text-2xl font-bold text-[#111]">
-                  {listing.areaGross ? `${listing.areaGross.toLocaleString('vi-VN')} m²` : '--'}
+                  {listing.areaGross
+                    ? `${listing.areaGross.toLocaleString("vi-VN")} m²`
+                    : "--"}
                 </p>
               </div>
               <div>
@@ -184,15 +224,15 @@ export default function PropertyDetailPage() {
                   Phòng ngủ
                 </p>
                 <p className="font-heading text-2xl font-bold text-[#111] flex items-center gap-2">
-                   {listing.attributes?.beds || '-'} <BedDouble size={20} className="text-slate-400" />
+                  {listing.attributes?.beds || "-"}{" "}
+                  <BedDouble size={20} className="text-slate-400" />
                 </p>
               </div>
               <div>
-                <p className="text-gray-400 text-xs uppercase mb-1">
-                  Số phòng
-                </p>
+                <p className="text-gray-400 text-xs uppercase mb-1">Số phòng</p>
                 <p className="font-heading text-2xl font-bold text-[#111] flex items-center gap-2">
-                   {listing.attributes?.rooms || '-'} <Bath size={20} className="text-slate-400" />
+                  {listing.attributes?.rooms || "-"}{" "}
+                  <Bath size={20} className="text-slate-400" />
                 </p>
               </div>
             </div>
@@ -205,32 +245,45 @@ export default function PropertyDetailPage() {
                 "Chưa có mô tả chi tiết cho bất động sản này."}
             </div>
           </div>
-          
-          <div>
+
+          <aside>
             <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 sticky top-[100px]">
-              <h3 className="font-heading text-lg font-bold text-[#111] mb-6">Liên hệ môi giới</h3>
+              <h3 className="font-heading text-lg font-bold text-[#111] mb-6">
+                Liên hệ môi giới
+              </h3>
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200">
                   {listing.user?.profile?.avatarUrl ? (
-                    <img src={listing.user.profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                    <img
+                      src={listing.user.profile.avatarUrl}
+                      alt="Avatar"
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-200 uppercase font-bold text-xl">
-                      {listing.user?.profile?.displayName?.charAt(0) || listing.user?.email?.charAt(0) || '?'}
+                      {listing.user?.profile?.displayName?.charAt(0) ||
+                        listing.user?.email?.charAt(0) ||
+                        "?"}
                     </div>
                   )}
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-900">{listing.user?.profile?.displayName || 'Môi giới dự án'}</h4>
+                  <h4 className="font-bold text-gray-900">
+                    {listing.user?.profile?.displayName || "Môi giới dự án"}
+                  </h4>
                   <p className="text-sm text-gray-500">{listing.user?.email}</p>
                 </div>
               </div>
-              <button className="w-full py-3 bg-[#111] text-white rounded-xl font-bold hover:bg-[#333] transition-colors">
-                Gửi tin nhắn
+              <button
+                className="w-full py-3 bg-[#111] text-white rounded-xl font-bold hover:bg-[#333] transition-colors"
+                onClick={handleContact}
+                disabled={isContacting}
+              >
+                {isContacting ? "Đang xử lý..." : "Liên hệ"}
               </button>
             </div>
-          </div>
+          </aside>
         </div>
-
       </main>
 
       <Footer />
