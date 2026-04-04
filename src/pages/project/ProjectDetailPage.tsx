@@ -8,6 +8,9 @@ import { LoginModal } from "../../components/auth/LoginModal";
 import { VerifyOtpModal } from "../../components/auth/VerifyOtpModal";
 import { useProjectDetail } from "../../hooks/useProjectDetail";
 import { getOrCreateConversation } from "../../api/chat.api";
+import { Flag } from "lucide-react";
+import { ReportModal } from "../../components/report/ReportModal";
+import { useAuthStore } from "../../store/useAuthStore";
 
 function formatPrice(price: number): string {
   if (!price) return "Thỏa thuận";
@@ -22,11 +25,13 @@ export default function ProjectDetailPage() {
   const { id } = useParams();
   const { listing, loading, error } = useProjectDetail(id);
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
 
   // Auth modal states
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isVerifyOtpOpen, setIsVerifyOtpOpen] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
   const [pendingEmail, setPendingEmail] = useState("");
 
   const handleSwitchToLogin = () => {
@@ -147,9 +152,19 @@ export default function ProjectDetailPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12">
           <div>
-            <h1 className="font-heading text-3xl font-bold text-[#111] uppercase mb-2 line-clamp-2">
-              {listing.title}
-            </h1>
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-2">
+              <h1 className="font-heading text-3xl font-bold text-[#111] uppercase line-clamp-2">
+                {listing.title}
+              </h1>
+              <button 
+                onClick={() => isAuthenticated ? setIsReportOpen(true) : setIsLoginOpen(true)}
+                className="flex items-center gap-2 text-gray-500 hover:text-red-600 font-primary transition-colors whitespace-nowrap bg-gray-50 px-3 py-1.5 rounded border border-gray-200 shadow-sm"
+                title="Báo cáo bài viết không hợp lệ"
+              >
+                <Flag size={18} />
+                <span className="text-sm rounded font-medium">Báo cáo</span>
+              </button>
+            </div>
             <p className="text-gray-500 font-primary text-lg mb-6">
               {listing.addressDisplay}
             </p>
@@ -233,6 +248,9 @@ export default function ProjectDetailPage() {
       </Modal>
       <Modal isOpen={isVerifyOtpOpen} onClose={() => setIsVerifyOtpOpen(false)}>
         <VerifyOtpModal email={pendingEmail} onSuccess={handleVerifySuccess} />
+      </Modal>
+      <Modal isOpen={isReportOpen} onClose={() => setIsReportOpen(false)} maxWidth="500px">
+        <ReportModal listingId={listing.id} onClose={() => setIsReportOpen(false)} />
       </Modal>
     </div>
   );
