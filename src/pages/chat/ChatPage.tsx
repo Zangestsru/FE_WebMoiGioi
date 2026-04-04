@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   EllipsisVertical,
   FileText,
@@ -15,6 +15,7 @@ import { useSocketStore } from "@/store/useSocketStore";
 import {
   getMyConversations,
   sendChatFile,
+  getConversationById,
   type Conversation,
   type ConversationMessage,
   type ConversationParticipant,
@@ -36,6 +37,8 @@ const isFileUrl = (url: string) => url.startsWith("http") && !isImageUrl(url);
 
 export default function ChatPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const conversationIdFromUrl = searchParams.get("conversationId");
   const { user } = useAuthStore();
   const { messages, joinRoom, leaveRoom, sendMessage, clearMessages } =
     useSocketStore();
@@ -74,7 +77,19 @@ export default function ChatPage() {
     void fetchConversations();
   }, []);
 
-  const handleSelectConversation = (conversation: Conversation) => {
+  useEffect(() => {
+    if (conversations.length > 0 && conversationIdFromUrl) {
+      if (activeConversation?.id !== conversationIdFromUrl) {
+        const target = conversations.find(c => c.id === conversationIdFromUrl);
+        if (target) {
+          handleSelectConversation(target);
+        }
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversations, conversationIdFromUrl, activeConversation]);
+
+  const handleSelectConversation = async (conversation: Conversation) => {
     if (currentRoomRef.current && currentRoomRef.current !== conversation.id) {
       leaveRoom(currentRoomRef.current);
     }
@@ -82,18 +97,39 @@ export default function ChatPage() {
     setActiveConversation(conversation);
     clearMessages();
     setStagedFile(null);
-
-    const mapped: ChatMessage[] = (conversation.messages ?? []).map(
-      (msg: ConversationMessage) => ({
-        id: msg.id,
-        senderId: msg.senderId,
-        content: msg.content,
-        createdAt: msg.createdAt,
-        type: msg.type,
-      }),
-    );
-    setHistoricalMessages(mapped);
     joinRoom(conversation.id);
+
+    try {
+      const updatedConversation = await getConversationById(conversation.id);
+      const mapped: ChatMessage[] = (updatedConversation.messages ?? []).map(
+        (msg: ConversationMessage) => ({
+          id: msg.id,
+          senderId: msg.senderId,
+          content: msg.content,
+          createdAt: msg.createdAt,
+          type: msg.type,
+        }),
+      );
+      setHistoricalMessages(mapped);
+
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.id === updatedConversation.id ? updatedConversation : c,
+        ),
+      );
+    } catch (error) {
+      console.error("Lỗi khi tải lại cuộc trò chuyện:", error);
+      const mapped: ChatMessage[] = (conversation.messages ?? []).map(
+        (msg: ConversationMessage) => ({
+          id: msg.id,
+          senderId: msg.senderId,
+          content: msg.content,
+          createdAt: msg.createdAt,
+          type: msg.type,
+        }),
+      );
+      setHistoricalMessages(mapped);
+    }
   };
 
   useEffect(() => {
@@ -118,6 +154,7 @@ export default function ChatPage() {
       roomId: activeConversation.id,
       message: draftMessage.trim(),
       senderId: String(user.id),
+      conversationId: activeConversation.id,
     });
     setDraftMessage("");
   };
@@ -298,9 +335,11 @@ export default function ChatPage() {
                             {name}
                           </p>
                           <p className="truncate text-xs text-chat-text">
-                            {messages[messages.length - 1]?.message ??
-                              conversation.lastMessage ??
-                              "Bắt đầu trò chuyện..."}
+                            {conversation.id ==
+                            messages[messages.length - 1]?.conversationId
+                              ? messages[messages.length - 1]?.message
+                              : (conversation.lastMessage ??
+                                "Bắt đầu trò chuyện...")}
                           </p>
                         </div>
                         <span className="text-[11px] text-chat-subtext shrink-0">

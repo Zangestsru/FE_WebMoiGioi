@@ -75,6 +75,7 @@ class SocketService {
     roomId: string;
     message: string;
     senderId: string;
+    conversationId: string;
   }): void {
     this.socket?.emit("send_message", data);
   }
@@ -85,6 +86,7 @@ class SocketService {
       senderId: string;
       message: string;
       timestamp: Date;
+      conversationId?: string;
     }) => void,
   ): void {
     this.socket?.off("receive_message");

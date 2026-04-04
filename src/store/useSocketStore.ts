@@ -5,6 +5,7 @@ interface Message {
   senderId: string;
   message: string;
   timestamp: Date;
+  conversationId: string;
 }
 
 interface SocketState {
@@ -20,6 +21,7 @@ interface SocketState {
     roomId: string;
     message: string;
     senderId: string;
+    conversationId: string;
   }) => void;
   addMessage: (msg: Message) => void;
   clearMessages: () => void;
@@ -37,11 +39,17 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     socket.on("disconnect", () => set({ isConnected: false }));
 
     socketService.onReceiveMessage(
-      (data: { senderId: string; message: string; timestamp: Date }) => {
+      (data: {
+        senderId: string;
+        message: string;
+        timestamp: Date;
+        conversationId?: string;
+      }) => {
         console.log("[Socket] Đã nhận tin nhắn mới", data);
         get().addMessage({
           ...data,
           timestamp: new Date(data.timestamp),
+          conversationId: data.conversationId || "",
         });
       },
     );

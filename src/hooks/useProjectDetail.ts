@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { listingApi } from '../api/listing.api';
-import type { Listing } from '../types/listing.types';
+import { useState, useEffect } from "react";
+import { listingApi } from "../api/listing.api";
+import type { Listing } from "../types/listing.types";
 
 export function useProjectDetail(id: string | undefined) {
   const [listing, setListing] = useState<Listing | null>(null);
@@ -16,11 +16,12 @@ export function useProjectDetail(id: string | undefined) {
         const res = await listingApi.getPublicListingById(id);
         if (res.success) {
           setListing(res.data);
+          console.log("listing: ", res.data);
         } else {
-          setError(res.message || 'Lỗi tải chi tiết bất động sản');
+          setError(res.message || "Lỗi tải chi tiết bất động sản");
         }
       } catch (err: any) {
-        setError(err.response?.data?.message || err.message || 'Lỗi kết nối');
+        setError(err.response?.data?.message || err.message || "Lỗi kết nối");
       } finally {
         setLoading(false);
       }

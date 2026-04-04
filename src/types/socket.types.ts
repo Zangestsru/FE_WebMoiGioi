@@ -5,6 +5,7 @@ export interface ServerToClientEvents {
     senderId: string;
     message: string;
     timestamp: Date;
+    conversationId: string;
   }) => void;
   new_notification: (message: string) => void;
 }
@@ -16,5 +17,6 @@ export interface ClientToServerEvents {
     roomId: string;
     message: string;
     senderId: string;
+    conversationId: string;
   }) => void;
 }
