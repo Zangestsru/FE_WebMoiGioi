@@ -128,13 +128,13 @@ export function AdminLayout() {
             <NavItem href="/admin/project-approvals" icon={Briefcase} label="Quản lý Dự án" isActive={location.pathname === "/admin/project-approvals"} />
 
             <NavItem href="/admin/report-approvals" icon={Flag} label="Báo cáo vi phạm" isActive={location.pathname === "/admin/report-approvals"} />
-            <NavItem href="#category" icon={Tags} label="Quản lý Danh mục" isActive={false} />
+            <NavItem href="/admin/categories" icon={Tags} label="Quản lý Danh mục" isActive={location.pathname === "/admin/categories"} />
 
             <NavItem href="#cms" icon={FileText} label="CMS (Tin tức)" isActive={false} />
 
             <NavItem href="#banner" icon={ImageIcon} label="Banner & Quảng cáo" isActive={false} />
 
-            <NavItem href="#users" icon={Users} label="Quản lý Người dùng" isActive={false} />
+            <NavItem href="/admin/users" icon={Users} label="Quản lý Người dùng" isActive={location.pathname === "/admin/users"} />
 
             <div className="mt-6 mb-2">
               <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-3">Vận hành</div>
