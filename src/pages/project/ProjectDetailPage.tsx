@@ -7,23 +7,13 @@ import { RegisterModal } from "../../components/auth/RegisterModal";
 import { LoginModal } from "../../components/auth/LoginModal";
 import { VerifyOtpModal } from "../../components/auth/VerifyOtpModal";
 import { useProjectDetail } from "../../hooks/useProjectDetail";
-import { getOrCreateConversation } from "../../api/chat.api";
-import { Flag } from "lucide-react";
-import { ReportModal } from "../../components/report/ReportModal";
+import { Flag, Home, Image as ImageIcon } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
-
-function formatPrice(price: number): string {
-  if (!price) return "Thỏa thuận";
-  if (price >= 1_000_000_000) {
-    const ty = price / 1_000_000_000;
-    return ty % 1 === 0 ? `${ty.toFixed(0)} tỷ` : `${Number(ty.toFixed(2))} tỷ`;
-  }
-  return new Intl.NumberFormat("vi-VN").format(price) + " ₫";
-}
+import { ListingCard } from "../../components/listing/ListingCard";
 
 export default function ProjectDetailPage() {
   const { id } = useParams();
-  const { listing, loading, error } = useProjectDetail(id);
+  const { project, loading, error } = useProjectDetail(id);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
 
@@ -31,7 +21,6 @@ export default function ProjectDetailPage() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isVerifyOtpOpen, setIsVerifyOtpOpen] = useState(false);
-  const [isReportOpen, setIsReportOpen] = useState(false);
   const [pendingEmail, setPendingEmail] = useState("");
 
   const handleSwitchToLogin = () => {
@@ -55,26 +44,12 @@ export default function ProjectDetailPage() {
     setIsLoginOpen(false);
   };
 
-  const [isContacting, setIsContacting] = useState(false);
-
-  const handleContact = async () => {
-    if (!id) return;
-    try {
-      setIsContacting(true);
-      const conversation = await getOrCreateConversation(id);
-      if (conversation && conversation.id) {
-        navigate(`/chat?conversationId=${conversation.id}`);
-      }
-    } catch (err: any) {
-      console.error("Error creating conversation:", err);
-      if (err?.response?.status === 401 || err?.response?.status === 403) {
-        setIsLoginOpen(true);
-      } else {
-        alert("Có lỗi xảy ra khi tạo cuộc trò chuyện. Vui lòng thử lại.");
-      }
-    } finally {
-      setIsContacting(false);
-    }
+  const getStatusBadge = (status: string | undefined) => {
+    if (!status) return <span className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded text-sm font-medium">Đang cập nhật</span>;
+    if (status === 'Sắp mở bán') return <span className="px-3 py-1.5 bg-red-50 text-red-600 rounded text-sm font-medium">{status}</span>;
+    if (status === 'Đang mở bán') return <span className="px-3 py-1.5 bg-green-50 text-green-600 rounded text-sm font-medium">{status}</span>;
+    if (status === 'Đã bàn giao') return <span className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded text-sm font-medium">{status}</span>;
+    return <span className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded text-sm font-medium">{status}</span>;
   };
 
   if (loading) {
@@ -86,40 +61,36 @@ export default function ProjectDetailPage() {
     );
   }
 
-  if (error || !listing) {
+  if (error || !project) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center">
         <p className="font-primary text-red-500 text-lg">
-          {error || "Không tìm thấy bất động sản"}
+          {error || "Không tìm thấy dự án"}
         </p>
         <button
-          onClick={() => (window.location.href = "/")}
+          onClick={() => (window.location.href = "/du-an")}
           className="mt-4 px-6 py-2 bg-[#111] text-white rounded"
         >
-          Trở về trang chủ
+          Trở về danh sách dự án
         </button>
       </div>
     );
   }
 
-  const primaryMedia = listing.media?.find((m: any) => m.isPrimary);
+  const primaryMedia = project.media?.find((m: any) => m.isPrimary) || project.media?.[0];
   const propertyImg = primaryMedia
     ? primaryMedia.originalUrl
     : "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=1200";
   const subImages =
-    listing.media?.filter((m: any) => !m.isPrimary).slice(0, 4) || [];
+    project.media?.filter((m: any) => m.id !== primaryMedia?.id).slice(0, 4) || [];
   const displaySubImages = [...subImages];
   while (displaySubImages.length < 4) {
     displaySubImages.push({ originalUrl: propertyImg } as any);
   }
 
-  const userDisplayName =
-    listing.user?.profile?.displayName ||
-    listing.user?.email ||
-    "Chuyên viên tư vấn";
-  const userAvatar =
-    listing.user?.profile?.avatarUrl ||
-    "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=200";
+  const addressDisplay = [project.addressText, project.wardName, project.districtName, project.provinceName]
+    .filter(Boolean)
+    .join(', ');
 
   return (
     <div className="min-h-screen bg-white flex flex-col overflow-x-hidden">
@@ -150,46 +121,38 @@ export default function ProjectDetailPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12 mb-12">
           <div>
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-2">
               <h1 className="font-heading text-3xl font-bold text-[#111] uppercase line-clamp-2">
-                {listing.title}
+                {project.name}
               </h1>
-              <button 
-                onClick={() => isAuthenticated ? setIsReportOpen(true) : setIsLoginOpen(true)}
-                className="flex items-center gap-2 text-gray-500 hover:text-red-600 font-primary transition-colors whitespace-nowrap bg-gray-50 px-3 py-1.5 rounded border border-gray-200 shadow-sm"
-                title="Báo cáo bài viết không hợp lệ"
-              >
-                <Flag size={18} />
-                <span className="text-sm rounded font-medium">Báo cáo</span>
-              </button>
             </div>
             <p className="text-gray-500 font-primary text-lg mb-6">
-              {listing.addressDisplay}
+              {addressDisplay}
             </p>
 
             <div className="flex flex-wrap items-center gap-8 py-6 border-y border-gray-100 mb-8">
               <div>
-                <p className="text-gray-400 text-xs uppercase mb-1">Mức giá</p>
-                <p className="font-heading text-2xl font-bold text-[#c4a946]">
-                  {formatPrice(listing.price)}
+                <p className="text-gray-400 text-xs uppercase mb-1">Trạng thái</p>
+                <div className="mt-1">
+                  {getStatusBadge(project.status)}
+                </div>
+              </div>
+              <div>
+                <p className="text-gray-400 text-xs uppercase mb-1">
+                  Tổng diện tích
+                </p>
+                <p className="font-heading text-2xl font-bold text-[#111]">
+                  {project.totalArea ? `${project.totalArea.toLocaleString('vi-VN')} m²` : '--'}
                 </p>
               </div>
               <div>
                 <p className="text-gray-400 text-xs uppercase mb-1">
-                  Diện tích
+                  Bất động sản
                 </p>
-                <p className="font-heading text-2xl font-bold text-[#111]">
-                  {listing.areaGross} m²
-                </p>
-              </div>
-              <div>
-                <p className="text-gray-400 text-xs uppercase mb-1">
-                  Phòng ngủ
-                </p>
-                <p className="font-heading text-2xl font-bold text-[#111]">
-                  {(listing.attributes as any)?.beds || "--"}
+                <p className="font-heading text-2xl font-bold text-[#111] flex items-center gap-2">
+                   {project.listings?.length || 0} <Home size={20} className="text-slate-400" />
                 </p>
               </div>
             </div>
@@ -198,37 +161,30 @@ export default function ProjectDetailPage() {
               Thông tin mô tả
             </h2>
             <div className="prose max-w-none text-gray-600 font-primary leading-relaxed whitespace-pre-line mb-10">
-              {(listing.attributes as any)?.description ||
-                "Chưa có mô tả chi tiết cho bất động sản này."}
+              {project.description ||
+                "Chưa có mô tả chi tiết cho dự án này."}
             </div>
           </div>
+        </div>
 
-          <aside className="relative">
-            <div className="sticky top-[100px] bg-[#1c1c1e] rounded-2xl p-8 shadow-xl text-white">
-              <div className="flex items-center gap-4 mb-8">
-                <img
-                  src={userAvatar}
-                  className="w-16 h-16 rounded-full object-cover border-2 border-gray-600 bg-white"
-                />
-                <div>
-                  <h3 className="text-lg font-medium">{userDisplayName}</h3>
-                  <p className="text-gray-400 text-sm">Chuyên viên tư vấn</p>
+        {/* Khối Danh sách Bất động sản */}
+        <div className="mt-8 border-t border-gray-200 pt-10">
+          <h2 className="font-heading text-2xl font-bold text-[#111] mb-6 border-l-4 border-[#c4a946] pl-4 uppercase">
+            Danh sách Bất động sản thuộc dự án
+          </h2>
+          {project.listings && project.listings.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {project.listings.map((listing) => (
+                <div key={listing.id} className="cursor-pointer" onClick={() => navigate(`/bat-dong-san/${listing.id}`)}>
+                  <ListingCard listing={listing} />
                 </div>
-              </div>
-              <div className="flex flex-col gap-4">
-                <button
-                  onClick={handleContact}
-                  disabled={isContacting}
-                  className="w-full bg-[#c4a946] hover:bg-[#b0963a] py-4 rounded-lg text-[#111] font-bold uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isContacting ? "Đang kết nối..." : "Liên hệ tư vấn"}
-                </button>
-                <button className="w-full bg-white hover:bg-gray-100 py-4 rounded-lg text-[#111] font-bold uppercase border border-gray-200">
-                  Xem hồ sơ pháp lý
-                </button>
-              </div>
+              ))}
             </div>
-          </aside>
+          ) : (
+            <p className="text-gray-500 font-primary">
+              Chưa có bất động sản nào đang mở bán hoặc cho thuê trong dự án này.
+            </p>
+          )}
         </div>
       </main>
 
@@ -248,9 +204,6 @@ export default function ProjectDetailPage() {
       </Modal>
       <Modal isOpen={isVerifyOtpOpen} onClose={() => setIsVerifyOtpOpen(false)}>
         <VerifyOtpModal email={pendingEmail} onSuccess={handleVerifySuccess} />
-      </Modal>
-      <Modal isOpen={isReportOpen} onClose={() => setIsReportOpen(false)} maxWidth="500px">
-        <ReportModal listingId={listing.id} onClose={() => setIsReportOpen(false)} />
       </Modal>
     </div>
   );

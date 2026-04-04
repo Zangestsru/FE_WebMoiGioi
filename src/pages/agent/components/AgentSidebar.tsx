@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Home, PlusSquare, Users, BarChart2, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Home, PlusSquare, FolderKanban, FolderPlus, Users, BarChart2, Settings, LogOut } from 'lucide-react';
 import { useAuthStore } from '../../../store/useAuthStore';
 
 export function AgentSidebar() {
@@ -15,6 +15,8 @@ export function AgentSidebar() {
     { icon: LayoutDashboard, label: 'Trang chủ', path: '/agent' },
     { icon: Home, label: 'Quản lý tin đăng', path: '/agent/dashboard' },
     { icon: PlusSquare, label: 'Đăng tin', path: '/agent/post' },
+    { icon: FolderKanban, label: 'Quản lý dự án', path: '/agent/projects' },
+    { icon: FolderPlus, label: 'Đăng dự án', path: '/agent/project-post' },
     { icon: Users, label: 'Khách hàng', path: '/agent/clients' },
     { icon: BarChart2, label: 'Thống kê', path: '/agent/analytics' },
     { icon: Settings, label: 'Cài đặt', path: '/agent/settings' },

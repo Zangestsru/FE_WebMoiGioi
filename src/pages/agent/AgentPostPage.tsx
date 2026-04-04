@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { UploadCloud, X, ArrowLeft } from 'lucide-react';
 import { listingApi } from '../../api/listing.api';
+import { projectApi, type ProjectOption } from '../../api/project.api';
 import { locationApi } from '../../api/location.api';
 import { useToastStore } from '../../store/useToastStore';
 
@@ -24,7 +25,8 @@ export function AgentPostPage() {
     wardCode: '',
     wardName: '',
     beds: '',
-    rooms: ''
+    rooms: '',
+    projectId: '',
   });
   
   // Property Types State
@@ -33,6 +35,9 @@ export function AgentPostPage() {
   // Location States
   const [provinces, setProvinces] = useState<{name: string, code: number}[]>([]);
   const [wards, setWards] = useState<any[]>([]);
+
+  // Projects for linking
+  const [myProjects, setMyProjects] = useState<ProjectOption[]>([]);
 
   // Images handling
   const [images, setImages] = useState<File[]>([]);
@@ -59,7 +64,8 @@ export function AgentPostPage() {
             wardCode: data.wardCode || '',
             wardName: data.wardName || '',
             beds: data.attributes?.beds ? data.attributes.beds.toString() : '',
-            rooms: data.attributes?.rooms ? data.attributes.rooms.toString() : ''
+            rooms: data.attributes?.rooms ? data.attributes.rooms.toString() : '',
+            projectId: data.projectId ? data.projectId.toString() : '',
           });
           
           // Pre-fetch wards if edit mode
@@ -104,6 +110,15 @@ export function AgentPostPage() {
 
     fetchTypes();
     fetchProvinces();
+
+    // Fetch the agent's approved projects for the dropdown
+    const fetchMyProjects = async () => {
+      try {
+        const res = await projectApi.getMyApprovedProjects();
+        setMyProjects(res.data || []);
+      } catch { /* ignore */ }
+    };
+    fetchMyProjects();
   }, []);
 
   const handleProvinceChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -188,7 +203,7 @@ export function AgentPostPage() {
       setIsSubmitting(true);
       const submitData = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
-        if (value) submitData.append(key, value);
+        submitData.append(key, value as string);
       });
       
 
@@ -308,6 +323,24 @@ export function AgentPostPage() {
                    <option key={type.id} value={type.id}>{type.name}</option>
                 ))}
               </select>
+            </div>
+
+            <div className="md:col-span-1">
+              <label className="block text-[14px] font-black text-gray-900 mb-2 uppercase tracking-wide">
+                Thuộc dự án
+              </label>
+              <select 
+                name="projectId"
+                value={formData.projectId}
+                onChange={handleInputChange}
+                className="w-full bg-[#F3F4F6] border-none rounded-2xl p-4 font-bold text-[15px] focus:ring-2 focus:ring-[#cfb53b] outline-none transition-all text-gray-900 appearance-none" 
+              >
+                <option value="">-- Không thuộc dự án --</option>
+                {myProjects.map(p => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+              <p className="text-[12px] font-bold text-gray-400 mt-1">Chỉ hiển thị dự án đã được duyệt của bạn</p>
             </div>
 
             <div className="md:col-span-1">

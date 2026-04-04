@@ -37,8 +37,7 @@ export function Navbar({ onLoginClick, onRegisterClick }: Readonly<NavbarProps>)
         {/* NAVIGATION LINKS - Desktop */}
         <div className="hidden lg:flex items-center gap-8">
           {[
-            { label: 'Mua', href: '#mua' },
-            { label: 'Bán', href: '#ban' },
+            { label: 'Bất động sản', href: '/bat-dong-san' },
             { label: 'Tin tức', href: '#tin-tuc' }
           ].map((item) => (
             <a
@@ -179,8 +178,7 @@ export function Navbar({ onLoginClick, onRegisterClick }: Readonly<NavbarProps>)
         <div className="lg:hidden fixed inset-0 top-[72px] bg-white z-[90] flex flex-col p-6 gap-6 animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex flex-col gap-4">
             {[
-              { label: 'Mua', href: '#mua' },
-              { label: 'Bán', href: '#ban' },
+              { label: 'Bất động sản', href: '/bat-dong-san' },
               { label: 'Tin tức', href: '#tin-tuc' }
             ].map((item) => (
               <a

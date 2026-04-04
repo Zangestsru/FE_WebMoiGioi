@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import { listingApi } from "../api/listing.api";
-import type { Listing } from "../types/listing.types";
+import { projectApi, type ProjectSummary } from "../api/project.api";
 
 export function useProjectDetail(id: string | undefined) {
-  const [listing, setListing] = useState<Listing | null>(null);
+  const [project, setProject] = useState<ProjectSummary & { listings?: any[] } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -13,12 +12,12 @@ export function useProjectDetail(id: string | undefined) {
     const fetchDetail = async () => {
       try {
         setLoading(true);
-        const res = await listingApi.getPublicListingById(id);
+        const res = await projectApi.getPublicProjectById(id);
         if (res.success) {
-          setListing(res.data);
-          console.log("listing: ", res.data);
+          setProject(res.data);
+          console.log("project detail: ", res.data);
         } else {
-          setError(res.message || "Lỗi tải chi tiết bất động sản");
+          setError(res.message || "Lỗi tải chi tiết dự án");
         }
       } catch (err: any) {
         setError(err.response?.data?.message || err.message || "Lỗi kết nối");
@@ -30,5 +29,5 @@ export function useProjectDetail(id: string | undefined) {
     fetchDetail();
   }, [id]);
 
-  return { listing, loading, error };
+  return { project, loading, error };
 }
