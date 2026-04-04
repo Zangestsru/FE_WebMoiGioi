@@ -6,11 +6,12 @@ import { Modal } from "../../components/ui/Modal";
 import { RegisterModal } from "../../components/auth/RegisterModal";
 import { LoginModal } from "../../components/auth/LoginModal";
 import { VerifyOtpModal } from "../../components/auth/VerifyOtpModal";
-import { BedDouble, Bath, MapPin } from "lucide-react";
+import { BedDouble, Bath, MapPin, Flag } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { listingApi } from "../../api/listing.api";
 import type { Listing } from "../../types/listing.types";
 import { getOrCreateConversation } from "@/api/chat.api";
+import { ReportModal } from "../../components/report/ReportModal";
 
 export default function PropertyDetailPage() {
   const { id } = useParams();
@@ -25,6 +26,7 @@ export default function PropertyDetailPage() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isVerifyOtpOpen, setIsVerifyOtpOpen] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
   const [pendingEmail, setPendingEmail] = useState("");
   const [isContacting, setIsContacting] = useState(false);
 
@@ -139,6 +141,21 @@ export default function PropertyDetailPage() {
     return new Intl.NumberFormat("vi-VN").format(p);
   };
 
+  let fullAddress = listing.addressDisplay || "";
+  if (listing.wardName && !fullAddress.includes(listing.wardName)) {
+    fullAddress += fullAddress ? `, ${listing.wardName}` : listing.wardName;
+  }
+  if (listing.districtName && !fullAddress.includes(listing.districtName)) {
+    fullAddress += fullAddress
+      ? `, ${listing.districtName}`
+      : listing.districtName;
+  }
+  if (listing.provinceName && !fullAddress.includes(listing.provinceName)) {
+    fullAddress += fullAddress
+      ? `, ${listing.provinceName}`
+      : listing.provinceName;
+  }
+
   return (
     <div className="min-h-screen bg-white flex flex-col overflow-x-hidden">
       <Navbar
@@ -174,10 +191,18 @@ export default function PropertyDetailPage() {
               <h1 className="font-heading text-3xl font-bold text-[#111] uppercase line-clamp-2">
                 {listing.title}
               </h1>
+              <button 
+                onClick={() => isAuthenticated ? setIsReportOpen(true) : setIsLoginOpen(true)}
+                className="flex items-center gap-2 text-gray-500 hover:text-red-600 font-primary transition-colors whitespace-nowrap bg-gray-50 px-3 py-1.5 rounded border border-gray-200 shadow-sm"
+                title="Báo cáo bài viết không hợp lệ"
+              >
+                <Flag size={18} />
+                <span className="text-sm rounded font-medium">Báo cáo</span>
+              </button>
             </div>
             <p className="text-gray-500 font-primary text-lg mb-6 flex items-start gap-2">
               <MapPin size={20} className="text-[#c4a946] mt-1 shrink-0" />
-              {listing.addressDisplay}
+              {fullAddress}
             </p>
 
             <div className="mb-6 flex flex-wrap gap-2">
@@ -302,6 +327,9 @@ export default function PropertyDetailPage() {
       </Modal>
       <Modal isOpen={isVerifyOtpOpen} onClose={() => setIsVerifyOtpOpen(false)}>
         <VerifyOtpModal email={pendingEmail} onSuccess={handleVerifySuccess} />
+      </Modal>
+      <Modal isOpen={isReportOpen} onClose={() => setIsReportOpen(false)} maxWidth="500px">
+        <ReportModal listingId={listing.id} onClose={() => setIsReportOpen(false)} />
       </Modal>
     </div>
   );

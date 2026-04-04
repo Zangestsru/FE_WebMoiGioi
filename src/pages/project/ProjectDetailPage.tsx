@@ -175,7 +175,7 @@ export default function ProjectDetailPage() {
           {project.listings && project.listings.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {project.listings.map((listing) => (
-                <div key={listing.id} className="cursor-pointer" onClick={() => navigate(`/nha-dat/${listing.slug || listing.id}`)}>
+                <div key={listing.id} className="cursor-pointer" onClick={() => navigate(`/bat-dong-san/${listing.id}`)}>
                   <ListingCard listing={listing} />
                 </div>
               ))}
