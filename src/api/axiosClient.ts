@@ -55,7 +55,7 @@ axiosClient.interceptors.response.use(
       try {
         // Attempt to refresh token
         // BE will use the refreshToken cookie automatically (withCredentials: true)
-        const apiBase = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+        const apiBase = getBaseURL();
         await axios.post(`${apiBase}/auth/refresh-token`, {}, { withCredentials: true });
 
         // After refresh, the new accessToken is in the cookie.
