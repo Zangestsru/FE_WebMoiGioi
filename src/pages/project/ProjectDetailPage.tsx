@@ -45,11 +45,35 @@ export default function ProjectDetailPage() {
   };
 
   const getStatusBadge = (status: string | undefined) => {
-    if (!status) return <span className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded text-sm font-medium">Đang cập nhật</span>;
-    if (status === 'Sắp mở bán') return <span className="px-3 py-1.5 bg-red-50 text-red-600 rounded text-sm font-medium">{status}</span>;
-    if (status === 'Đang mở bán') return <span className="px-3 py-1.5 bg-green-50 text-green-600 rounded text-sm font-medium">{status}</span>;
-    if (status === 'Đã bàn giao') return <span className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded text-sm font-medium">{status}</span>;
-    return <span className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded text-sm font-medium">{status}</span>;
+    if (!status)
+      return (
+        <span className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded text-sm font-medium">
+          Đang cập nhật
+        </span>
+      );
+    if (status === "Sắp mở bán")
+      return (
+        <span className="px-3 py-1.5 bg-red-50 text-red-600 rounded text-sm font-medium">
+          {status}
+        </span>
+      );
+    if (status === "Đang mở bán")
+      return (
+        <span className="px-3 py-1.5 bg-green-50 text-green-600 rounded text-sm font-medium">
+          {status}
+        </span>
+      );
+    if (status === "Đã bàn giao")
+      return (
+        <span className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded text-sm font-medium">
+          {status}
+        </span>
+      );
+    return (
+      <span className="px-3 py-1.5 bg-slate-100 text-slate-600 rounded text-sm font-medium">
+        {status}
+      </span>
+    );
   };
 
   if (loading) {
@@ -77,20 +101,27 @@ export default function ProjectDetailPage() {
     );
   }
 
-  const primaryMedia = project.media?.find((m: any) => m.isPrimary) || project.media?.[0];
+  const primaryMedia =
+    project.media?.find((m: any) => m.isPrimary) || project.media?.[0];
   const propertyImg = primaryMedia
     ? primaryMedia.originalUrl
     : "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=1200";
   const subImages =
-    project.media?.filter((m: any) => m.id !== primaryMedia?.id).slice(0, 4) || [];
+    project.media?.filter((m: any) => m.id !== primaryMedia?.id).slice(0, 4) ||
+    [];
   const displaySubImages = [...subImages];
   while (displaySubImages.length < 4) {
     displaySubImages.push({ originalUrl: propertyImg } as any);
   }
 
-  const addressDisplay = [project.addressText, project.wardName, project.districtName, project.provinceName]
+  const addressDisplay = [
+    project.addressText,
+    project.wardName,
+    project.districtName,
+    project.provinceName,
+  ]
     .filter(Boolean)
-    .join(', ');
+    .join(", ");
 
   return (
     <div className="min-h-screen bg-white flex flex-col overflow-x-hidden">
@@ -134,17 +165,19 @@ export default function ProjectDetailPage() {
 
             <div className="flex flex-wrap items-center gap-8 py-6 border-y border-gray-100 mb-8">
               <div>
-                <p className="text-gray-400 text-xs uppercase mb-1">Trạng thái</p>
-                <div className="mt-1">
-                  {getStatusBadge(project.status)}
-                </div>
+                <p className="text-gray-400 text-xs uppercase mb-1">
+                  Trạng thái
+                </p>
+                <div className="mt-1">{getStatusBadge(project.status)}</div>
               </div>
               <div>
                 <p className="text-gray-400 text-xs uppercase mb-1">
                   Tổng diện tích
                 </p>
                 <p className="font-heading text-2xl font-bold text-[#111]">
-                  {project.totalArea ? `${project.totalArea.toLocaleString('vi-VN')} m²` : '--'}
+                  {project.totalArea
+                    ? `${project.totalArea.toLocaleString("vi-VN")} m²`
+                    : "--"}
                 </p>
               </div>
               <div>
@@ -152,7 +185,8 @@ export default function ProjectDetailPage() {
                   Bất động sản
                 </p>
                 <p className="font-heading text-2xl font-bold text-[#111] flex items-center gap-2">
-                   {project.listings?.length || 0} <Home size={20} className="text-slate-400" />
+                  {project.listings?.length || 0}{" "}
+                  <Home size={20} className="text-slate-400" />
                 </p>
               </div>
             </div>
@@ -161,8 +195,7 @@ export default function ProjectDetailPage() {
               Thông tin mô tả
             </h2>
             <div className="prose max-w-none text-gray-600 font-primary leading-relaxed whitespace-pre-line mb-10">
-              {project.description ||
-                "Chưa có mô tả chi tiết cho dự án này."}
+              {project.description || "Chưa có mô tả chi tiết cho dự án này."}
             </div>
           </div>
         </div>
@@ -175,14 +208,19 @@ export default function ProjectDetailPage() {
           {project.listings && project.listings.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {project.listings.map((listing) => (
-                <div key={listing.id} className="cursor-pointer" onClick={() => navigate(`/bat-dong-san/${listing.id}`)}>
+                <div
+                  key={listing.id}
+                  className="cursor-pointer"
+                  onClick={() => navigate(`/bat-dong-san/${listing.id}`)}
+                >
                   <ListingCard listing={listing} />
                 </div>
               ))}
             </div>
           ) : (
             <p className="text-gray-500 font-primary">
-              Chưa có bất động sản nào đang mở bán hoặc cho thuê trong dự án này.
+              Chưa có bất động sản nào đang mở bán hoặc cho thuê trong dự án
+              này.
             </p>
           )}
         </div>
