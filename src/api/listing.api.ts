@@ -1,11 +1,11 @@
-import axiosClient from './axiosClient';
+import axiosClient, { getBaseURL } from './axiosClient';
 import axios from 'axios';
 import type { Listing } from '../types/listing.types';
 import type { ApiResponse } from '../types/user.types';
 
 // Public axios instance (no auth interceptor)
 const publicAxios = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: getBaseURL(),
   headers: { 'Content-Type': 'application/json' },
 });
 

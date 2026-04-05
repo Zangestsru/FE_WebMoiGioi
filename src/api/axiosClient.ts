@@ -4,7 +4,7 @@ import axios from 'axios';
  * Axios Client configuration.
  * Handles baseURL, interceptors for auth headers, and automatic token refreshing.
  */
-const getBaseURL = () => {
+export const getBaseURL = () => {
   const envBase = import.meta.env.VITE_API_BASE_URL;
   // Nếu không có env hoặc env chứa giá trị mặc định 'yourdomain.com'
   if (!envBase || envBase.includes('yourdomain.com')) {
