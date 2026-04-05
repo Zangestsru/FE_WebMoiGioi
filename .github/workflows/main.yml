@@ -1,0 +1,32 @@
+name: Deploy Frontend 
+
+on:
+  push:
+    branches:
+      - fe # Chạy khi push vào nhánh fe
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # Thay 'zangestsru/cv_ngogiaphuong' bằng repo Docker Hub của bạn nếy khác
+          tags: zangestsru/cv_ngogiaphuong:latest 
+
+      - name: Trigger Deployment Webhook
+        run: |
+          # Thay URL webhook của bạn vào đây
+          curl -X POST "http://103.1.238.175:8080/deploy/zangestsru/cv_ngogiaphuong"
