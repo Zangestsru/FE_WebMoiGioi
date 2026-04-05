@@ -22,6 +22,7 @@ const INITIAL_FORM_STATE: RegisterFormState = {
 export function useRegisterForm() {
   const [formState, setFormState] = useState<RegisterFormState>(INITIAL_FORM_STATE);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [successMessage, setSuccessMessage] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const { showStatus } = useUIStore();
   const navigate = useNavigate();
@@ -49,6 +50,7 @@ export function useRegisterForm() {
     e.preventDefault();
     setIsLoading(true);
     setErrors({});
+    setSuccessMessage(undefined);
 
     try {
       const result = await authService.register(formState);
@@ -61,6 +63,7 @@ export function useRegisterForm() {
       if (result.response?.success) {
         // Store email for OTP verification step
         localStorage.setItem('pending_auth_email', formState.email);
+        setSuccessMessage('Đăng ký thành công! Vui lòng kiểm tra email để xác thực.');
 
         return true;
       }
@@ -79,6 +82,7 @@ export function useRegisterForm() {
   return {
     formState,
     errors,
+    successMessage,
     isLoading,
     handleChange,
     handleSubmit,
