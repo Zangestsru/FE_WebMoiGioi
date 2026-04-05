@@ -1,11 +1,19 @@
 import axios from 'axios';
 
-/**
- * Base URL cho Vietnam Provinces API v2.
- * Ưu tiên dùng env variable VITE_LOCATION_API_URL, fallback sang derive từ VITE_API_BASE_URL.
- */
-const locationBaseUrl = import.meta.env.VITE_LOCATION_API_URL
-  || (import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '/api/v2') : '/api/v2');
+const getLocationBaseURL = () => {
+  const envLocation = import.meta.env.VITE_LOCATION_API_URL;
+  const envBase = import.meta.env.VITE_API_BASE_URL;
+  
+  if (envLocation && !envLocation.includes('yourdomain.com')) return envLocation;
+  
+  if (envBase && !envBase.includes('yourdomain.com')) {
+    return envBase.replace('/api/v1', '/api/v2');
+  }
+  
+  return '/api/v2';
+};
+
+const locationBaseUrl = getLocationBaseURL();
 
 export const locationApi = {
   /** Lấy danh sách tất cả tỉnh/thành */

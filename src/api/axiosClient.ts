@@ -4,13 +4,21 @@ import axios from 'axios';
  * Axios Client configuration.
  * Handles baseURL, interceptors for auth headers, and automatic token refreshing.
  */
+const getBaseURL = () => {
+  const envBase = import.meta.env.VITE_API_BASE_URL;
+  // Nếu không có env hoặc env chứa giá trị mặc định 'yourdomain.com'
+  if (!envBase || envBase.includes('yourdomain.com')) {
+    return '/api/v1';
+  }
+  return envBase;
+};
+
 const axiosClient = axios.create({
-  // Mặc định gọi đường dẫn tương đối '/api/v1'. Nginx sẽ bắt tự động và đẩy về backend.
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api/v1',
+  baseURL: getBaseURL(),
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Crucial for sending/receiving cookies
+  withCredentials: true,
 });
 
 // Utility to get cookie value
