@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Users, Search, Loader2, ShieldAlert, CheckCircle, Ban, Edit2, Lock } from "lucide-react";
+import { Users, Search, Loader2, ShieldAlert, CheckCircle, Ban, Edit2, Lock, RefreshCw } from "lucide-react";
 import { userApi } from "../../api/user.api";
 import type { User, UserProfile } from "../../types/user.types";
 import { useToastStore } from "../../store/useToastStore";
@@ -116,7 +116,7 @@ export function UserManagement() {
           </div>
           
           <button onClick={fetchUsers} className="flex items-center gap-2 px-3 py-1.5 border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50 transition-colors">
-            <Loader2 className={isLoading ? "animate-spin" : ""} size={16} />
+            <RefreshCw className={isLoading ? "animate-spin" : ""} size={16} />
             Làm mới
           </button>
         </div>
