@@ -6,17 +6,6 @@ COPY package.json package-lock.json ./
 RUN npm ci
 # Build code thành file tĩnh (thư mục dist)
 COPY . .
-
-# Đón nhận các biến build-time từ GitHub Actions
-ARG VITE_API_BASE_URL
-ARG VITE_GOOGLE_CLIENT_ID
-ARG VITE_FACEBOOK_APP_ID
-
-# Đưa vào môi trường build của Vite
-ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
-ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
-ENV VITE_FACEBOOK_APP_ID=$VITE_FACEBOOK_APP_ID
-
 RUN npm run build
 
 # --- GIAI ĐOẠN 2: RUN ---
