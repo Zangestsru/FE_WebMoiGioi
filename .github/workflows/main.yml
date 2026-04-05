@@ -51,12 +51,16 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ~/bds
-            
-            # Kéo các bản build mới nhất của backend và frontend (Dùng Docker Compose V2)
-            docker compose pull backend frontend
-            
-            # Khởi động lại duy nhất service frontend
+
+            # Dọn container cũ (nếu có - tạo bằng docker run tay từ trước)
+            docker stop fe_bds_container 2>/dev/null || true
+            docker rm   fe_bds_container 2>/dev/null || true
+
+            # Kéo image mới nhất
+            docker compose pull frontend
+
+            # Khởi động service frontend (Nginx + Reverse Proxy)
             docker compose up -d frontend
-            
-            # Kiểm tra nhanh trạng thái sau khi deploy
+
+            # Kiểm tra trạng thái
             docker compose ps
