@@ -31,7 +31,7 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/fe_bds:latest
+            zangestsru/fe_bds:latest
 
   deploy:
     runs-on: ubuntu-latest
