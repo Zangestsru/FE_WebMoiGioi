@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - develop
-
+      - cicd/setup
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
