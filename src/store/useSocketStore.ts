@@ -45,7 +45,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
         timestamp: Date;
         conversationId?: string;
       }) => {
-        console.log("[Socket] Đã nhận tin nhắn mới", data);
+        // Received new message
         get().addMessage({
           ...data,
           timestamp: new Date(data.timestamp),

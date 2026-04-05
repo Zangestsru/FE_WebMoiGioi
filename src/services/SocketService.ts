@@ -5,7 +5,7 @@ import type {
 } from "@/types/socket.types";
 import { getCookie } from "@/utils/GetCookie";
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL ?? "http://localhost:3000";
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || (typeof window !== "undefined" ? window.location.origin : "");
 
 type AppSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
@@ -24,11 +24,9 @@ class SocketService {
     });
 
     this.socket.on("connect", () => {
-      console.log("[Socket] Connected:", this.socket?.id);
     });
 
     this.socket.on("disconnect", (reason) => {
-      console.log("[Socket] Disconnected:", reason);
     });
 
     this.socket.on("connect_error", (err) => {

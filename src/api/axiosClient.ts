@@ -5,12 +5,8 @@ import axios from 'axios';
  * Handles baseURL, interceptors for auth headers, and automatic token refreshing.
  */
 export const getBaseURL = () => {
-  const envBase = import.meta.env.VITE_API_BASE_URL;
-  // Nếu không có env hoặc env chứa giá trị mặc định 'yourdomain.com'
-  if (!envBase || envBase.includes('yourdomain.com')) {
-    return '/api/v1';
-  }
-  return envBase;
+  // Tuân thủ Rules: Lấy URL từ biến môi trường, không hardcode logic kiểm tra domain
+  return import.meta.env.VITE_API_BASE_URL || '/api/v1';
 };
 
 const axiosClient = axios.create({

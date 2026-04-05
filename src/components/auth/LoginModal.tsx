@@ -131,7 +131,7 @@ export function LoginModal({ onSwitchToRegister, onSwitchToForgotPassword, onSuc
                       }
                     }}
                     onError={() => {
-                      console.log('Login Failed');
+                      // Failed
                     }}
                     theme="outline"
                     size="large"

@@ -15,7 +15,6 @@ export function useProjectDetail(id: string | undefined) {
         const res = await projectApi.getPublicProjectById(id);
         if (res.success) {
           setProject(res.data);
-          console.log("project detail: ", res.data);
         } else {
           setError(res.message || "Lỗi tải chi tiết dự án");
         }

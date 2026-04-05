@@ -134,7 +134,7 @@ export default function LoginPage() {
                       }
                     }}
                     onError={() => {
-                      console.log('Login Failed');
+                      // Failed
                     }}
                     useOneTap
                     theme="outline"
