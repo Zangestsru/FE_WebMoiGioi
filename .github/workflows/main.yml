@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - develop
-      - cicd/setup
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -30,9 +30,9 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            zangestsru/fe_bds:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/fe_bds:latest
           build-args: |
-            VITE_API_BASE_URL=https://your-domain.com/api/v1
+            VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
             VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }}
             VITE_FACEBOOK_APP_ID=${{ secrets.VITE_FACEBOOK_APP_ID }}
 
@@ -55,8 +55,8 @@ jobs:
           script: |
             cd ~/bds
             
-            # Pull image mới nhất
-            docker pull zangestsru/fe_bds:latest
+            # Pull image từ Docker Hub (dùng Secret username)
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/fe_bds:latest
             
             # Xử lý container cũ
             docker stop fe_bds_container || true
@@ -67,7 +67,8 @@ jobs:
               --name fe_bds_container \
               -p 81:80 \
               --restart always \
-              zangestsru/fe_bds:latest
+              ${{ secrets.DOCKERHUB_USERNAME }}/fe_bds:latest
+
             
             # Kiểm tra nhanh
             docker ps | grep fe_bds_container
