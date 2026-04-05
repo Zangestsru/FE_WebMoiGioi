@@ -52,23 +52,12 @@ jobs:
           script: |
             cd ~/bds
             
-            # Pull image từ Docker Hub (dùng Secret username)
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/fe_bds:latest
+            # Kéo các bản build mới nhất của backend và frontend
+            docker-compose pull backend frontend
             
-            # Xử lý container cũ
-            docker stop fe_bds_container || true
-            docker rm fe_bds_container || true
+            # Khởi động lại duy nhất service frontend
+            docker-compose up -d frontend
             
-            # Chạy container mới
-            docker run -d \
-              --name fe_bds_container \
-              -p 81:80 \
-              --restart always \
-              ${{ secrets.DOCKERHUB_USERNAME }}/fe_bds:latest
-
-            
-            # Kiểm tra nhanh
-            docker ps | grep fe_bds_container
 
 
 
