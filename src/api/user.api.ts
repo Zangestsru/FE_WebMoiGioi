@@ -96,5 +96,42 @@ export const userApi = {
     const response = await axiosClient.patch(`/user/admin/users/${id}`, data);
     return response.data;
   },
+
+  /**
+   * Admin: Get all brokers with pagination, search, and filter
+   */
+  getAdminBrokers: async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+  }): Promise<ApiResponse<{
+    brokers: any[];
+    pagination: { page: number; limit: number; total: number; totalPages: number };
+  }>> => {
+    const response = await axiosClient.get('/user/admin/brokers', { params });
+    return response.data;
+  },
+
+  /**
+   * Admin: Get broker statistics
+   */
+  getAdminBrokerStats: async (): Promise<ApiResponse<{
+    total: number;
+    active: number;
+    locked: number;
+    newThisMonth: number;
+  }>> => {
+    const response = await axiosClient.get('/user/admin/broker-stats');
+    return response.data;
+  },
+
+  /**
+   * Admin: Toggle broker status (ACTIVE <-> LOCKED)
+   */
+  updateBrokerStatus: async (id: string | number, status: string): Promise<ApiResponse<User>> => {
+    const response = await axiosClient.patch(`/user/admin/brokers/${id}/status`, { status });
+    return response.data;
+  },
 };
 

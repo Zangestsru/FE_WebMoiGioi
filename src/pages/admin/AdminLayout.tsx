@@ -130,9 +130,9 @@ export function AdminLayout() {
             <NavItem href="/admin/report-approvals" icon={Flag} label="Báo cáo vi phạm" isActive={location.pathname === "/admin/report-approvals"} />
             <NavItem href="/admin/categories" icon={Tags} label="Quản lý Danh mục" isActive={location.pathname === "/admin/categories"} />
 
-            <NavItem href="#cms" icon={FileText} label="CMS (Tin tức)" isActive={false} />
+            {/* <NavItem href="#cms" icon={FileText} label="CMS (Tin tức)" isActive={false} /> */}
 
-            <NavItem href="#banner" icon={ImageIcon} label="Banner & Quảng cáo" isActive={false} />
+            {/* <NavItem href="#banner" icon={ImageIcon} label="Banner & Quảng cáo" isActive={false} /> */}
 
             <NavItem href="/admin/users" icon={Users} label="Quản lý Người dùng" isActive={location.pathname === "/admin/users"} />
 
@@ -154,19 +154,25 @@ export function AdminLayout() {
                   <ShieldCheck size={16} />
                   Yêu cầu Phê duyệt
                 </Link>
-                <Link to="#broker-list" className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-md transition-colors">
+                <Link
+                  to="/admin/broker-management"
+                  className={clsx(
+                    "flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors",
+                    location.pathname === "/admin/broker-management" ? "text-blue-600 bg-blue-50 font-medium" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                  )}
+                >
                   <List size={16} />
                   Danh sách Môi giới
                 </Link>
-                <Link to="#broker-tiers" className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-md transition-colors">
+                {/* <Link to="#broker-tiers" className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-md transition-colors">
                   <Award size={16} />
                   Cấp bậc/Hạng
-                </Link>
+                </Link> */}
               </NavItem>
 
-              <NavItem href="#pricing" icon={DollarSign} label="Bảng giá Dịch vụ" isActive={false} />
+              {/* <NavItem href="#pricing" icon={DollarSign} label="Bảng giá Dịch vụ" isActive={false} />
 
-              <NavItem href="#support" icon={HeadphonesIcon} label="Hỗ trợ Khách hàng" isActive={false} />
+              <NavItem href="#support" icon={HeadphonesIcon} label="Hỗ trợ Khách hàng" isActive={false} /> */}
             </div>
           </nav>
         </div>

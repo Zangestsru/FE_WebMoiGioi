@@ -26,17 +26,17 @@ function StatCardSkeleton() {
   );
 }
 
-function StatCard({ 
-  title, 
-  value, 
-  change, 
+function StatCard({
+  title,
+  value,
+  change,
   icon: Icon,
   trend,
   colorClass
-}: { 
-  title: string, 
-  value: string, 
-  change: string, 
+}: {
+  title: string,
+  value: string,
+  change: string,
   icon: any,
   trend: 'up' | 'down',
   colorClass: string
@@ -131,9 +131,9 @@ export function Dashboard() {
           >
             Xuất Báo cáo
           </button>
-          <button className="px-4 py-2 bg-blue-600 rounded-lg text-sm font-medium text-white hover:bg-blue-700 transition-colors shadow-sm">
+          {/* <button className="px-4 py-2 bg-blue-600 rounded-lg text-sm font-medium text-white hover:bg-blue-700 transition-colors shadow-sm">
             Tin đăng Mới
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -209,13 +209,13 @@ export function Dashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={postsByMonth}>
                   <CartesianGrid key="grid" strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis key="xaxis" dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b'}} dy={10} />
-                  <YAxis key="yaxis" axisLine={false} tickLine={false} tick={{fill: '#64748b'}} dx={-10} allowDecimals={false} />
+                  <XAxis key="xaxis" dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} dy={10} />
+                  <YAxis key="yaxis" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} dx={-10} allowDecimals={false} />
                   <Tooltip key="tooltip"
                     formatter={(value: any) => [value, 'Bài đăng']}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   />
-                  <Line key="line-1" type="monotone" dataKey="total" stroke="#2563eb" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} activeDot={{r: 6}} name="Bài đăng" />
+                  <Line key="line-1" type="monotone" dataKey="total" stroke="#2563eb" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} name="Bài đăng" />
                 </LineChart>
               </ResponsiveContainer>
             )}
@@ -240,10 +240,10 @@ export function Dashboard() {
                   { name: 'Tháng này', value: userCount?.thisMonth ?? 0 },
                 ]}>
                   <CartesianGrid key="grid" strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis key="xaxis" dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b'}} dy={10} />
-                  <YAxis key="yaxis" axisLine={false} tickLine={false} tick={{fill: '#64748b'}} dx={-10} allowDecimals={false} />
+                  <XAxis key="xaxis" dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} dy={10} />
+                  <YAxis key="yaxis" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} dx={-10} allowDecimals={false} />
                   <Tooltip key="tooltip"
-                    cursor={{fill: '#f1f5f9'}}
+                    cursor={{ fill: '#f1f5f9' }}
                     formatter={(value: any) => [value, 'Người dùng mới']}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   />

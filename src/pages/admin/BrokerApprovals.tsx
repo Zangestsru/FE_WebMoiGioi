@@ -89,9 +89,9 @@ export function BrokerApprovals() {
                 <tr key={req.id} className="hover:bg-slate-50 transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <ImageWithFallback 
-                        src={req.profile?.avatarUrl || "https://images.unsplash.com/photo-1625502709763-f5f3880c17ba?ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwb3J0cmFpdCUyMG1hbiUyMHN1aXR8ZW58MXx8fHwxNzc0MTQxNTg2fDA"} 
-                        alt={req.profile?.displayName || req.email} 
+                      <ImageWithFallback
+                        src={req.profile?.avatarUrl || "https://images.unsplash.com/photo-1625502709763-f5f3880c17ba?ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwb3J0cmFpdCUyMG1hbiUyMHN1aXR8ZW58MXx8fHwxNzc0MTQxNTg2fDA"}
+                        alt={req.profile?.displayName || req.email}
                         className="w-10 h-10 rounded-full object-cover border border-slate-200"
                       />
                       <div>
@@ -180,20 +180,20 @@ export function BrokerApprovals() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white z-10">
               <h2 className="text-lg font-bold text-slate-900">Chi tiết Đơn đăng ký Môi giới</h2>
-              <button 
+              <button
                 onClick={() => setSelectedRequest(null)}
                 className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
               >
                 <X size={20} />
               </button>
             </div>
-            
+
             <div className="p-6 overflow-y-auto flex-1 space-y-8">
               {/* Applicant Info */}
               <div className="flex items-start gap-4">
-                <ImageWithFallback 
-                  src={selectedRequest.profile?.avatarUrl || "https://images.unsplash.com/photo-1625502709763-f5f3880c17ba"} 
-                  alt={selectedRequest.profile?.displayName || selectedRequest.email} 
+                <ImageWithFallback
+                  src={selectedRequest.profile?.avatarUrl || "https://images.unsplash.com/photo-1625502709763-f5f3880c17ba"}
+                  alt={selectedRequest.profile?.displayName || selectedRequest.email}
                   className="w-16 h-16 rounded-full object-cover border border-slate-200"
                 />
                 <div>
@@ -221,12 +221,12 @@ export function BrokerApprovals() {
               <div>
                 <h4 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">Tài liệu đã Nộp</h4>
                 <div className="space-y-4">
-                  <div>
+                  {/* <div>
                     <p className="text-sm font-medium text-slate-700 mb-2">Số CMND/CCCD: <span className="font-normal">{selectedRequest.profile?.identityCardNumber || "CCCD"}</span></p>
-                  </div>
+                  </div> */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm font-medium text-slate-700">Chứng chỉ Hành nghề Môi giới / Link ảnh</p>
+                      <p className="text-sm font-medium text-slate-700">Chứng chỉ Hành nghề Môi giới / Link ảnh</p>
                     </div>
                     <div className="w-full aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100 mb-4">
                       <ImageWithFallback
@@ -280,16 +280,16 @@ export function BrokerApprovals() {
             </div>
 
             <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-3 sticky bottom-0">
-              <button 
+              <button
                 onClick={() => setSelectedRequest(null)}
                 className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors shadow-sm"
               >
                 Hủy
               </button>
-              
+
               {(selectedRequest.status === 'PENDING_VERIFICATION' || selectedRequest.status === 'Chờ duyệt') && (
                 isRejecting ? (
-                  <button 
+                  <button
                     onClick={() => handleAction(selectedRequest.id, "Đã từ chối")}
                     disabled={!rejectReason.trim()}
                     className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -298,13 +298,13 @@ export function BrokerApprovals() {
                   </button>
                 ) : (
                   <>
-                    <button 
+                    <button
                       onClick={() => setIsRejecting(true)}
                       className="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors shadow-sm"
                     >
                       Từ chối Đơn
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleAction(selectedRequest.id, "Đã duyệt")}
                       className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
                     >
