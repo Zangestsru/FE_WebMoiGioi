@@ -5,7 +5,7 @@ import axios from 'axios';
  * Ưu tiên dùng env variable VITE_LOCATION_API_URL, fallback sang derive từ VITE_API_BASE_URL.
  */
 const locationBaseUrl = import.meta.env.VITE_LOCATION_API_URL
-  || (import.meta.env.VITE_API_BASE_URL || '').replace('/api/v1', '/api/v2');
+  || (import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '/api/v2') : '/api/v2');
 
 export const locationApi = {
   /** Lấy danh sách tất cả tỉnh/thành */

@@ -8,14 +8,15 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# --- GIAI ĐOẠN 2: RUN ---
-FROM node:22-bookworm-slim
-WORKDIR /app
-# Cài đặt công cụ 'serve' để chạy web tĩnh
-RUN npm install -g serve
-# Chỉ lấy thư mục dist từ builder (GĐ1)
-COPY --from=builder /app/dist ./dist
+# --- GIAI ĐOẠN 2: RUN VỚI NGINX ---
+FROM nginx:alpine
+# Copy file tĩnh (kết quả của GĐ1) vào thư mục web mặc định của Nginx
+COPY --from=builder /app/dist /usr/share/nginx/html
+# Copy file cấu hình Nginx do chúng ta tự viết đè lên cấu hình mặc định
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Mở port 80
 EXPOSE 80
-# Lệnh "bật công tắc" để chạy ứng dụng
-ENTRYPOINT ["serve", "-s", "dist", "-l", "80"]
+
+# Chạy Nginx
+CMD ["nginx", "-g", "daemon off;"]

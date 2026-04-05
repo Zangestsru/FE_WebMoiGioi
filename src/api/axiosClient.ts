@@ -5,7 +5,8 @@ import axios from 'axios';
  * Handles baseURL, interceptors for auth headers, and automatic token refreshing.
  */
 const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  // Mặc định gọi đường dẫn tương đối '/api/v1'. Nginx sẽ bắt tự động và đẩy về backend.
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -46,7 +47,8 @@ axiosClient.interceptors.response.use(
       try {
         // Attempt to refresh token
         // BE will use the refreshToken cookie automatically (withCredentials: true)
-        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/refresh-token`, {}, { withCredentials: true });
+        const apiBase = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+        await axios.post(`${apiBase}/auth/refresh-token`, {}, { withCredentials: true });
 
         // After refresh, the new accessToken is in the cookie.
         // Retry the original request
