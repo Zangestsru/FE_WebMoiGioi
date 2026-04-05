@@ -1,19 +1,7 @@
 import axios from 'axios';
+import { getBaseURL } from './axiosClient';
 
-const getLocationBaseURL = () => {
-  const envLocation = import.meta.env.VITE_LOCATION_API_URL;
-  const envBase = import.meta.env.VITE_API_BASE_URL;
-  
-  if (envLocation && !envLocation.includes('yourdomain.com')) return envLocation;
-  
-  if (envBase && !envBase.includes('yourdomain.com')) {
-    return envBase.replace('/api/v1', '/api/v2');
-  }
-  
-  return '/api/v2';
-};
-
-const locationBaseUrl = getLocationBaseURL();
+const locationBaseUrl = getBaseURL().replace('/api/v1', '/api/v2');
 
 export const locationApi = {
   /** Lấy danh sách tất cả tỉnh/thành */
