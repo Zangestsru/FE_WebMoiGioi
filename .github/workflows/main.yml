@@ -32,6 +32,11 @@ jobs:
           push: true
           tags: |
             zangestsru/fe_bds:latest
+          build-args: |
+            VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+            VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}
+            VITE_REGISTER_BG_IMAGE=${{ secrets.VITE_REGISTER_BG_IMAGE }}
+            VITE_FACEBOOK_APP_ID=${{ secrets.VITE_FACEBOOK_APP_ID }}
 
   deploy:
     runs-on: ubuntu-latest
