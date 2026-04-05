@@ -52,12 +52,11 @@ jobs:
           script: |
             cd ~/bds
             
-            # Kéo các bản build mới nhất của backend và frontend
-            docker-compose pull backend frontend
+            # Kéo các bản build mới nhất của backend và frontend (Dùng Docker Compose V2)
+            docker compose pull backend frontend
             
             # Khởi động lại duy nhất service frontend
-            docker-compose up -d frontend
+            docker compose up -d frontend
             
-
-
-
+            # Kiểm tra nhanh trạng thái sau khi deploy
+            docker compose ps
